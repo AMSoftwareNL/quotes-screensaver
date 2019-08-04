@@ -16,31 +16,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace AMSoftware.Quotes
 {
-    public partial class MainForm : Form
+    internal class RenderSettings
     {
-        private Quote _quote;
-
-        public MainForm()
-        {
-            InitializeComponent();
-        }
-
-        internal void MainForm_QuoteChanged(object sender, QuoteEventArgs e)
-        {
-            _quote = e.NewQuote;
-            this.Refresh();
-        }
-
-        private void MainForm_Paint(object sender, PaintEventArgs e)
-        {
-            using (Graphics g = this.CreateGraphics())
-            {
-                GraphicsHelper.DrawQuote(g, _quote);
-            }
-        }
+        public Font TextFont { get; set; }
+        public Color TextColor { get; set; }
+        public Color BackgroundColor { get; set; }
+        public TextAlignment TextAlignment { get; set; }
+        public bool TextShrinkToFit { get; set; }
+        public string BackgroundImagePath { get; set; }
     }
 }

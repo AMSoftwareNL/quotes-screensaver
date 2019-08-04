@@ -19,12 +19,13 @@ using AMSoftware.Quotes.Properties;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Collections;
 
 namespace AMSoftware.Quotes
 {
     public partial class ConfigForm : Form
     {
-        private Settings _configSettings;
+        private readonly Settings _configSettings;
 
         public ConfigForm()
         {
@@ -32,54 +33,98 @@ namespace AMSoftware.Quotes
 
             _configSettings = Settings.Default;
 
-            fontTextBox.Text = $"{_configSettings.QuotesFont.FontFamily.Name}; {_configSettings.QuotesFont.Style}; {_configSettings.QuotesColor.Name}";
-            backgroundTextBox.Text = $"{_configSettings.QuotesBackgroundColor.Name}";
-            pathTextBox.Text = _configSettings.QuotesPath;
+            pathTextBox.Text = _configSettings.SourcePath;
+
+            fontTextBox.Text = $"{_configSettings.TextFont.FontFamily.Name}; {_configSettings.TextFont.Style}; {_configSettings.TextColor.Name}";
+            shrinkToFitCheckBox.Checked = _configSettings.TextShrinkToFit;
+
+            alignmentComboBox.DataSource = new ArrayList()
+            {
+                Tuple.Create<TextAlignment,string>(TextAlignment.Auto, "Auto"),
+                Tuple.Create<TextAlignment,string>(TextAlignment.Left, "Left"),
+                Tuple.Create<TextAlignment, string>(TextAlignment.Center, "Center"),
+                Tuple.Create<TextAlignment, string>(TextAlignment.Right, "Right")
+            };
+            alignmentComboBox.DisplayMember = "Item2";
+            alignmentComboBox.ValueMember = "Item1";
+            alignmentComboBox.SelectedValue = (TextAlignment)_configSettings.TextAlignment;
+
+            backgroundColorTextBox.Text = $"{_configSettings.BackgroundColor.Name}";
+            backgroundImageTextBox.Text = _configSettings.BackgroundImagePath;
         }
 
         private void FontButton_Click(object sender, EventArgs e)
         {
-            fontDialog.Color = _configSettings.QuotesColor;
-            fontDialog.Font = _configSettings.QuotesFont;
+            fontDialog.Color = _configSettings.TextColor;
+            fontDialog.Font = _configSettings.TextFont;
 
             if (fontDialog.ShowDialog(this) == DialogResult.OK)
             {
-                _configSettings.QuotesFont = fontDialog.Font;
-                _configSettings.QuotesColor = fontDialog.Color;
+                _configSettings.TextFont = fontDialog.Font;
+                _configSettings.TextColor = fontDialog.Color;
 
-                fontTextBox.Text = $"{_configSettings.QuotesFont.FontFamily.Name}; {_configSettings.QuotesFont.Style}; {_configSettings.QuotesColor.Name}";
-
-                previewPanel.Refresh();
+                fontTextBox.Text = $"{_configSettings.TextFont.FontFamily.Name}; {_configSettings.TextFont.Style}; {_configSettings.TextColor.Name}";
 
                 applyButton.Enabled = true;
             }
         }
 
-        private void BackgroundButton_Click(object sender, EventArgs e)
+        private void ShrinkToFitCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            colorDialog.Color = _configSettings.QuotesBackgroundColor;
+            _configSettings.TextShrinkToFit = shrinkToFitCheckBox.Checked;
 
-            if (colorDialog.ShowDialog(this) == DialogResult.OK)
+            applyButton.Enabled = true;
+        }
+
+        private void AlignmentComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (alignmentComboBox.SelectedValue != null)
             {
-                _configSettings.QuotesBackgroundColor = colorDialog.Color;
-
-                backgroundTextBox.Text = $"{_configSettings.QuotesBackgroundColor.Name}";
-
-                previewPanel.Refresh();
-
-                applyButton.Enabled = true;
+                if (alignmentComboBox.SelectedValue is TextAlignment)
+                {
+                    _configSettings.TextAlignment = (int)alignmentComboBox.SelectedValue;
+                    applyButton.Enabled = true;
+                }
             }
         }
 
         private void PathButton_Click(object sender, EventArgs e)
         {
-            pathDialog.SelectedPath = _configSettings.QuotesPath;
+            openFileDialog.Filter = "Quotes XML|*.xml|All files|*.*";
+            openFileDialog.Title = "Select quoute source";
 
-            if (pathDialog.ShowDialog(this) == DialogResult.OK)
+            openFileDialog.FileName = _configSettings.SourcePath;
+            if (openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
-                _configSettings.QuotesPath = pathDialog.SelectedPath;
+                _configSettings.SourcePath = openFileDialog.FileName;
+                pathTextBox.Text = _configSettings.SourcePath;
 
-                pathTextBox.Text = _configSettings.QuotesPath;
+                applyButton.Enabled = true;
+            }
+        }
+
+        private void BackgroundColorButton_Click(object sender, EventArgs e)
+        {
+            colorDialog.Color = _configSettings.BackgroundColor;
+            if (colorDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                _configSettings.BackgroundColor = colorDialog.Color;
+                backgroundColorTextBox.Text = $"{_configSettings.BackgroundColor.Name}";
+
+                applyButton.Enabled = true;
+            }
+        }
+
+        private void BackgroundImageButton_Click(object sender, EventArgs e)
+        {
+            openFileDialog.Filter = "Bitmap files|*.bmp;*.dib|JPEG|*.jpg;*.jpeg;*.jpe;*.jfif|GIF|*.gif|PNG|*.png|All Picture Files|*.bmp;*.dib;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.png|All files|*.*";
+            openFileDialog.Title = "Select background image";
+
+            openFileDialog.FileName = _configSettings.BackgroundImagePath;
+            if (openFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                _configSettings.BackgroundImagePath = openFileDialog.FileName;
+                backgroundImageTextBox.Text = _configSettings.BackgroundImagePath;
 
                 applyButton.Enabled = true;
             }
@@ -88,6 +133,8 @@ namespace AMSoftware.Quotes
         private void ApplyButton_Click(object sender, EventArgs e)
         {
             _configSettings.Save();
+
+            applyButton.Enabled = false;
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
@@ -104,12 +151,53 @@ namespace AMSoftware.Quotes
 
         private void PreviewPanel_Paint(object sender, PaintEventArgs e)
         {
+            Quote q = null;
+            if (string.IsNullOrWhiteSpace(_configSettings.SourcePath))
+            {
+                q = QuoteReader.Default;
+            }
+            else
+            {
+                QuoteReader reader = QuoteReader.Create(_configSettings.SourcePath);
+                q = reader?.Read() ?? QuoteReader.Default;
+            }
+
+            if (!string.IsNullOrWhiteSpace(previewQuoteTextBox.Text))
+            {
+                q = new Quote()
+                {
+                    QuoteText = previewQuoteTextBox.Lines,
+                    Author = previewAuthorTextBox.Text,
+                    Year = previewYearTextBox.Text
+                };
+            }
+
             using (Graphics g = previewPanel.CreateGraphics())
             {
-                Quote q = QuoteHelper.GetQuote();
-
-                GraphicsHelper.DrawQuote(g, q, _configSettings);
+                QuoteRenderer renderer = new QuoteRenderer(new RenderSettings()
+                {
+                    TextFont = _configSettings.TextFont,
+                    TextColor = _configSettings.TextColor,
+                    TextAlignment = (TextAlignment)_configSettings.TextAlignment,
+                    TextShrinkToFit = true,
+                    BackgroundColor = _configSettings.BackgroundColor,
+                    BackgroundImagePath = _configSettings.BackgroundImagePath
+                });
+                renderer.Render(q, g);
             }
+        }
+
+        private void ConfigurationTabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (configurationTabControl.SelectedTab.Name == "previewTabPage")
+            {
+                previewPanel.Refresh();
+            }
+        }
+
+        private void PreviewTextBox_Leave(object sender, EventArgs e)
+        {
+            previewPanel.Refresh();
         }
     }
 }

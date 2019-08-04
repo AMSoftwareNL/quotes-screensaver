@@ -2,17 +2,26 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AMSoftware.Quotes.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="QuotesPath" Type="System.String" Scope="User">
+    <Setting Name="SourcePath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="QuotesFont" Type="System.Drawing.Font" Scope="User">
+    <Setting Name="TextFont" Type="System.Drawing.Font" Scope="User">
       <Value Profile="(Default)">Segoe UI Semibold, 12pt</Value>
     </Setting>
-    <Setting Name="QuotesColor" Type="System.Drawing.Color" Scope="User">
+    <Setting Name="TextColor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">White</Value>
     </Setting>
-    <Setting Name="QuotesBackgroundColor" Type="System.Drawing.Color" Scope="User">
+    <Setting Name="BackgroundColor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Black</Value>
+    </Setting>
+    <Setting Name="TextAlignment" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="TextShrinkToFit" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="BackgroundImagePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

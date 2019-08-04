@@ -15,6 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+using AMSoftware.Quotes.Properties;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -23,9 +24,6 @@ namespace AMSoftware.Quotes
 {
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main(string[] args)
         {
@@ -40,55 +38,99 @@ namespace AMSoftware.Quotes
 
             if (args.Length > 0)
             {
-                if (args[0].StartsWith("/c", StringComparison.InvariantCultureIgnoreCase)) // show config modal on parent
+                var splitArgs = args[0].Split(':');
+                string commandArgument = splitArgs[0];
+                int parentHwndArgument = 0;
+
+                if (commandArgument.Equals("/c", StringComparison.InvariantCultureIgnoreCase)) // show config modal
                 {
-                    if (args[0].Contains(":"))
+                    if (splitArgs.Length == 2)
                     {
-                        ShowConfigModal(args);
+                        int.TryParse(splitArgs[1], out parentHwndArgument);
+                    }
+                    RunConfiguration(parentHwndArgument);
+                }
+                else if (commandArgument.Equals("/p", StringComparison.InvariantCultureIgnoreCase)) // preview screensaver
+                {
+                    if (args.Length >= 2 && int.TryParse(args[1], out parentHwndArgument))
+                    {
+                        RunPreview(parentHwndArgument);
                     }
                     else
                     {
-                        Application.Run(new ConfigForm());
+                        throw new ArgumentException("Missing or invalid parent window handle.");
                     }
                 }
-                else if (args[0].Equals("/p", StringComparison.InvariantCultureIgnoreCase)) // preview screensaver
+                else if (commandArgument.Equals("/s", StringComparison.InvariantCultureIgnoreCase)) // show screensaver
                 {
-                    PaintPreview(args);
-                }
-                else if (args[0].Equals("/s", StringComparison.InvariantCultureIgnoreCase)) // show screensaver
-                {
-                    Application.Run(new ScreensaverApplicationContext());
+                    QuoteReader reader = InitReader();
+                    RenderSettings renderSettings = InitRenderSettings();
+                    Application.Run(new ScreensaverApplicationContext(reader, renderSettings));
                 }
             }
-            else // show config modal
+            else // show config non-modal
             {
                 Application.Run(new ConfigForm());
             }
         }
 
-        private static void PaintPreview(string[] args)
+        private static void RunPreview(int parentHwndArgument)
         {
-            int parentHwndArgument = int.Parse(args[1]);
+            QuoteReader reader = InitReader();
+            RenderSettings renderSettings = InitRenderSettings();
+            renderSettings.TextShrinkToFit = true;
+            QuoteRenderer renderer = new QuoteRenderer(renderSettings);
+            Quote quote = reader?.Read() ?? QuoteReader.Default;
+
             using (Graphics g = Graphics.FromHwnd(new IntPtr(parentHwndArgument)))
             {
-                GraphicsHelper.DrawQuote(g, QuoteHelper.GetQuote());
+                renderer.Render(quote, g);
             }
         }
 
-        private static void ShowConfigModal(string[] args)
+        private static void RunConfiguration(int parentHwndArgument)
         {
-            var splitArgs = args[0].Split(':');
-            int parentHwndArgument = int.Parse(splitArgs[1]);
+            NativeWindow parentWindow = new NativeWindow();
+            if (parentHwndArgument != 0)
+            {
+                parentWindow.AssignHandle(new IntPtr(parentHwndArgument));
+            }
 
-            NativeWindow w = new NativeWindow();
-            w.AssignHandle(new IntPtr(parentHwndArgument));
+            ConfigForm form = new ConfigForm();
+            form.ShowDialog(parentWindow);
+        }
 
-            new ConfigForm().ShowDialog(w);
+        private static RenderSettings InitRenderSettings()
+        {
+            return new RenderSettings()
+            {
+                TextFont = Settings.Default.TextFont,
+                TextColor = Settings.Default.TextColor,
+                TextAlignment = (TextAlignment)Settings.Default.TextAlignment,
+                TextShrinkToFit = Settings.Default.TextShrinkToFit,
+                BackgroundColor = Settings.Default.BackgroundColor,
+                BackgroundImagePath = Settings.Default.BackgroundImagePath
+            };
+        }
+
+        private static QuoteReader InitReader()
+        {
+            if (string.IsNullOrWhiteSpace(Settings.Default.SourcePath))
+            {
+                return null;
+            }
+
+            return QuoteReader.Create(Settings.Default.SourcePath);
         }
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
+#if DEBUG
             MessageBox.Show(e.Exception.ToString());
+#else
+            MessageBox.Show(e.Exception.Message);
+#endif
+
         }
     }
 }

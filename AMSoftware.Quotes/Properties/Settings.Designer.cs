@@ -12,7 +12,7 @@ namespace AMSoftware.Quotes.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.1.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -26,48 +26,84 @@ namespace AMSoftware.Quotes.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string QuotesPath {
+        public string SourcePath {
             get {
-                return ((string)(this["QuotesPath"]));
+                return ((string)(this["SourcePath"]));
             }
             set {
-                this["QuotesPath"] = value;
+                this["SourcePath"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI Semibold, 12pt")]
-        public global::System.Drawing.Font QuotesFont {
+        public global::System.Drawing.Font TextFont {
             get {
-                return ((global::System.Drawing.Font)(this["QuotesFont"]));
+                return ((global::System.Drawing.Font)(this["TextFont"]));
             }
             set {
-                this["QuotesFont"] = value;
+                this["TextFont"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("White")]
-        public global::System.Drawing.Color QuotesColor {
+        public global::System.Drawing.Color TextColor {
             get {
-                return ((global::System.Drawing.Color)(this["QuotesColor"]));
+                return ((global::System.Drawing.Color)(this["TextColor"]));
             }
             set {
-                this["QuotesColor"] = value;
+                this["TextColor"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Black")]
-        public global::System.Drawing.Color QuotesBackgroundColor {
+        public global::System.Drawing.Color BackgroundColor {
             get {
-                return ((global::System.Drawing.Color)(this["QuotesBackgroundColor"]));
+                return ((global::System.Drawing.Color)(this["BackgroundColor"]));
             }
             set {
-                this["QuotesBackgroundColor"] = value;
+                this["BackgroundColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int TextAlignment {
+            get {
+                return ((int)(this["TextAlignment"]));
+            }
+            set {
+                this["TextAlignment"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TextShrinkToFit {
+            get {
+                return ((bool)(this["TextShrinkToFit"]));
+            }
+            set {
+                this["TextShrinkToFit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BackgroundImagePath {
+            get {
+                return ((string)(this["BackgroundImagePath"]));
+            }
+            set {
+                this["BackgroundImagePath"] = value;
             }
         }
     }

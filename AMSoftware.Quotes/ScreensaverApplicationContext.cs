@@ -15,42 +15,73 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-using System;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace AMSoftware.Quotes
 {
-    public class ScreensaverApplicationContext : ApplicationContext
+    internal class ScreensaverApplicationContext : ApplicationContext
     {
-        internal event EventHandler<QuoteEventArgs> QuoteChanged;
-
         private Point? _previousMouseLocation = null;
+        private Quote _quote = null;
+        private readonly Form[] _forms = null;
+        private readonly QuoteRenderer _renderer;
+        private readonly QuoteReader _reader;
 
-        public ScreensaverApplicationContext() : base()
+        public ScreensaverApplicationContext(QuoteReader reader, RenderSettings settings) : base()
         {
-            foreach (Screen item in Screen.AllScreens)
+            _renderer = new QuoteRenderer(settings);
+            _reader = reader;
+
+            SetQuote();
+
+            _forms = new Form[Screen.AllScreens.Length];
+            for (int i = 0; i < Screen.AllScreens.Length; i++)
             {
-                MainForm screenForm = new MainForm
-                {
-                    Bounds = item.Bounds,
-                    StartPosition = FormStartPosition.Manual
-                };
-
-                this.QuoteChanged += screenForm.MainForm_QuoteChanged;
-
-                screenForm.KeyDown += RegisteredForm_KeyDown;
-                screenForm.KeyUp += RegisteredForm_KeyUp;
-                screenForm.MouseDown += RegisteredForm_MouseDown;
-                screenForm.MouseMove += RegisteredForm_MouseMove;
-
-                screenForm.Show();
+                _forms[i] = InitScreen(Screen.AllScreens[i], settings);
+                _forms[i].Show();
             }
+        }
 
-            OnQuoteChanged(new QuoteEventArgs()
+        private Form InitScreen(Screen screen, RenderSettings settings)
+        {
+            Form f = new Form()
             {
-                NewQuote = QuoteHelper.GetQuote()
-            });
+                AutoScaleDimensions = new SizeF(12F, 25F),
+                AutoScaleMode = AutoScaleMode.Font,
+                BackColor = settings.BackgroundColor,
+                ClientSize = new Size(976, 635),
+                Cursor = Cursors.No,
+                ForeColor = settings.TextColor,
+                FormBorderStyle = FormBorderStyle.None,
+                Name = "MainForm",
+                ShowIcon = false,
+                ShowInTaskbar = false,
+                WindowState = FormWindowState.Maximized,
+                Bounds = screen.Bounds,
+                StartPosition = FormStartPosition.Manual
+            };
+
+            f.Paint += RegisteredForm_Paint;
+            f.KeyDown += RegisteredForm_KeyDown;
+            f.KeyUp += RegisteredForm_KeyUp;
+            f.MouseDown += RegisteredForm_MouseDown;
+            f.MouseMove += RegisteredForm_MouseMove;
+            
+            return f;
+        }
+
+        private void SetQuote()
+        {
+            _quote = _reader?.Read() ?? QuoteReader.Default;
+
+            if (_forms != null)
+            {
+                foreach (Form item in _forms)
+                {
+                    item.Refresh();
+                }
+            }
         }
 
         private void RegisteredForm_MouseMove(object sender, MouseEventArgs e)
@@ -58,7 +89,8 @@ namespace AMSoftware.Quotes
             if (_previousMouseLocation == null)
             {
                 _previousMouseLocation = e.Location;
-            } else if (e.Location != _previousMouseLocation.Value)
+            }
+            else if (e.Location != _previousMouseLocation.Value)
             {
                 ExitThread();
             }
@@ -82,16 +114,13 @@ namespace AMSoftware.Quotes
         {
             if (e.KeyCode == Keys.Space)
             {
-                OnQuoteChanged(new QuoteEventArgs()
-                {
-                    NewQuote = QuoteHelper.GetQuote()
-                });
+                SetQuote();
             }
         }
 
-        protected virtual void OnQuoteChanged(QuoteEventArgs e)
+        private void RegisteredForm_Paint(object sender, PaintEventArgs e)
         {
-            QuoteChanged?.Invoke(this, e);
+            _renderer.Render(_quote, e.Graphics);
         }
 
         protected override void Dispose(bool disposing)
