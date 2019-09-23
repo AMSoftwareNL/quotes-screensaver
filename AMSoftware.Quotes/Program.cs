@@ -84,7 +84,7 @@ namespace AMSoftware.Quotes
 
             using (Graphics g = Graphics.FromHwnd(new IntPtr(parentHwndArgument)))
             {
-                renderer.Render(quote, g);
+                renderer.Render(quote, g, Screen.FromHandle(new IntPtr(parentHwndArgument)).Bounds);
             }
         }
 
@@ -109,7 +109,8 @@ namespace AMSoftware.Quotes
                 TextAlignment = (TextAlignment)Settings.Default.TextAlignment,
                 TextShrinkToFit = Settings.Default.TextShrinkToFit,
                 BackgroundColor = Settings.Default.BackgroundColor,
-                BackgroundImagePath = Settings.Default.BackgroundImagePath
+                BackgroundImagePath = Settings.Default.BackgroundImagePath,
+                BackgroundAlignment = (BackgroundAlignment)Settings.Default.BackgroundAlignment
             };
         }
 

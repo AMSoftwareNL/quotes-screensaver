@@ -33,32 +33,39 @@ namespace AMSoftware.Quotes
 
         public void Render(Quote q, Graphics g)
         {
-            g.Clear(_settings.BackgroundColor);
+            RectangleF clipBounds = g.VisibleClipBounds;
 
-            if (!string.IsNullOrWhiteSpace(_settings.BackgroundImagePath))
-            {
-                try
-                {
-                    Image backgroundImage = Image.FromFile(_settings.BackgroundImagePath);
-                    g.DrawImage(backgroundImage, g.VisibleClipBounds);
-                }
-                catch { }
-            }
+            RenderBackground(g, clipBounds);
+            RenderText(q, g, clipBounds);
 
-            if (q == null)
-            {
-                g.Flush(FlushIntention.Flush);
-                return;
-            }
+            g.Flush(FlushIntention.Flush);
+        }
+
+        public void Render(Quote q, Graphics g, RectangleF measureBounds)
+        {
+            g.ScaleTransform(
+                g.VisibleClipBounds.Width / measureBounds.Width,
+                g.VisibleClipBounds.Height / measureBounds.Height,
+                MatrixOrder.Append);
+
+            RenderBackground(g, measureBounds);
+            RenderText(q, g, measureBounds);
+
+            g.Flush(FlushIntention.Flush);
+        }
+
+        private void RenderText(Quote q, Graphics g, RectangleF displayBounds)
+        {
+            if (q == null) return;
 
             // Set a margin of 5%
-            float marginLeft = g.VisibleClipBounds.Width * 0.05F;
-            float marginTop = g.VisibleClipBounds.Height * 0.05F;
+            float marginLeft = displayBounds.Width * 0.05F;
+            float marginTop = displayBounds.Height * 0.05F;
             RectangleF layoutArea = new RectangleF(
                 marginLeft,
                 marginTop,
-                g.VisibleClipBounds.Width - (2.0F * marginLeft),
-                g.VisibleClipBounds.Height - (2.0F * marginTop)
+                displayBounds.Width - (2.0F * marginLeft),
+                displayBounds.Height - (2.0F * marginTop)
             );
 
             // Print author and year of quote.
@@ -90,8 +97,121 @@ namespace AMSoftware.Quotes
                     DrawQuoteText(q.QuoteText, g, textFont, _settings.TextColor, layoutArea);
                 }
             }
+        }
 
-            g.Flush(FlushIntention.Flush);
+        private void RenderBackground(Graphics g, RectangleF displayBounds)
+        {
+            g.Clear(_settings.BackgroundColor);
+
+            if (!string.IsNullOrWhiteSpace(_settings.BackgroundImagePath))
+            {
+                try
+                {
+                    Image backgroundImage = Image.FromFile(_settings.BackgroundImagePath);
+
+                    switch (_settings.BackgroundAlignment)
+                    {
+                        case BackgroundAlignment.Fit:
+                            DrawBackgroundFitted(g, backgroundImage, displayBounds);
+                            break;
+                        case BackgroundAlignment.Stretch:
+                            DrawBackgroundStretched(g, backgroundImage, displayBounds);
+                            break;
+                        case BackgroundAlignment.Center:
+                            DrawBackgroundCentered(g, backgroundImage, displayBounds);
+                            break;
+                        case BackgroundAlignment.Tile:
+                            DrawBackgroundTiled(g, backgroundImage, displayBounds);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void DrawBackgroundFitted(Graphics g, Image backgroundImage, RectangleF displayBounds)
+        {
+            float ratioScreen = displayBounds.Width / displayBounds.Height;
+            float ratioImage = (float)backgroundImage.Width / (float)backgroundImage.Height;
+
+            if (ratioScreen > ratioImage)
+            {
+                float width = displayBounds.Height * ratioImage;
+                RectangleF destRectangle = new RectangleF(
+                    (displayBounds.Width - width) / 2, 0,
+                    width, displayBounds.Height);
+
+                g.DrawImage(backgroundImage, destRectangle);
+            }
+            else
+            {
+                float height = displayBounds.Width * ratioImage;
+                RectangleF destRectangle = new RectangleF(
+                    0, (displayBounds.Height - height) / 2,
+                    displayBounds.Width, height);
+
+                g.DrawImage(backgroundImage, destRectangle);
+            }
+        }
+
+        private static void DrawBackgroundStretched(Graphics g, Image backgroundImage, RectangleF displayBounds)
+        {
+            float ratioScreen = displayBounds.Width / displayBounds.Height;
+            float ratioImage = (float)backgroundImage.Width / (float)backgroundImage.Height;
+
+            if (ratioScreen > ratioImage)
+            {
+                float height = backgroundImage.Width / ratioScreen;
+                RectangleF srcRectangle = new RectangleF(
+                    0, (backgroundImage.Height - height) / 2,
+                    backgroundImage.Width, height);
+
+                g.DrawImage(backgroundImage, displayBounds, srcRectangle, GraphicsUnit.Pixel);
+            }
+            else
+            {
+                float width = backgroundImage.Height / ratioScreen;
+                RectangleF srcRectangle = new RectangleF(
+                    (backgroundImage.Width - width) / 2, 0,
+                    width, backgroundImage.Height);
+
+                g.DrawImage(backgroundImage, displayBounds, srcRectangle, GraphicsUnit.Pixel);
+            }
+        }
+
+        private static void DrawBackgroundTiled(Graphics g, Image backgroundImage, RectangleF displayBounds)
+        {
+            Rectangle srcRectangle = new Rectangle(0, 0, backgroundImage.Width, backgroundImage.Height);
+
+            int tileCountWidth = (int)Math.Ceiling(displayBounds.Width / srcRectangle.Width);
+            int tileCountHeight = (int)Math.Ceiling(displayBounds.Height / srcRectangle.Height);
+
+            int offsetX = (int)Math.Round(((tileCountWidth * srcRectangle.Width) - displayBounds.Width) / 2);
+            int offsetY = (int)Math.Round(((tileCountHeight * srcRectangle.Height) - displayBounds.Height) / 2); ;
+
+            for (int y = 0; y < tileCountHeight; y++)
+            {
+                for (int x = 0; x < tileCountWidth; x++)
+                {
+                    Rectangle destRectangle = new Rectangle((x * srcRectangle.Width) - offsetX, (y * srcRectangle.Height) - offsetY, srcRectangle.Width, srcRectangle.Height);
+                    g.DrawImageUnscaledAndClipped(backgroundImage, destRectangle);
+                }
+            }
+        }
+
+        private static void DrawBackgroundCentered(Graphics g, Image backgroundImage, RectangleF displayBounds)
+        {
+            Rectangle destRectangle = new Rectangle()
+            {
+                Width = backgroundImage.Width,
+                Height = backgroundImage.Height,
+                X = (int)Math.Round((displayBounds.Width - backgroundImage.Width) / 2),
+                Y = (int)Math.Round((displayBounds.Height - backgroundImage.Height) / 2)
+            };
+
+            g.DrawImageUnscaledAndClipped(backgroundImage, destRectangle);
         }
 
         private static Font GetFittedFont(string text, Graphics g, Font textFont, RectangleF area)
@@ -105,11 +225,11 @@ namespace AMSoftware.Quotes
 
                 if (shrinkFactorHeight < shrinkFactorWidth)
                 {
-                    return new Font(textFont.FontFamily, textFont.Size * shrinkFactorHeight);
+                    return new Font(textFont.FontFamily, textFont.Size * shrinkFactorHeight, textFont.Style);
                 }
                 else
                 {
-                    return new Font(textFont.FontFamily, textFont.Size * shrinkFactorWidth);
+                    return new Font(textFont.FontFamily, textFont.Size * shrinkFactorWidth, textFont.Style);
                 }
 
             }

@@ -27,5 +27,6 @@ namespace AMSoftware.Quotes
         public TextAlignment TextAlignment { get; set; }
         public bool TextShrinkToFit { get; set; }
         public string BackgroundImagePath { get; set; }
+        public BackgroundAlignment BackgroundAlignment { get; internal set; }
     }
 }

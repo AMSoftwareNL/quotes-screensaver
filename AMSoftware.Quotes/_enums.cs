@@ -12,4 +12,12 @@ namespace AMSoftware.Quotes
         Center,
         Right
     }
+
+    internal enum BackgroundAlignment
+    {
+        Fit = 0,
+        Stretch,
+        Center,
+        Tile
+    }
 }

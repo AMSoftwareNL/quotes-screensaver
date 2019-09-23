@@ -45,29 +45,50 @@ namespace AMSoftware.Quotes
 
         private Form InitScreen(Screen screen, RenderSettings settings)
         {
+#if DEBUG
             Form f = new Form()
             {
-                AutoScaleDimensions = new SizeF(12F, 25F),
                 AutoScaleMode = AutoScaleMode.Font,
                 BackColor = settings.BackgroundColor,
-                ClientSize = new Size(976, 635),
+                Cursor = Cursors.No,
+                ForeColor = settings.TextColor,
+                FormBorderStyle = FormBorderStyle.Sizable,
+                Name = "MainForm",
+                ShowIcon = false,
+                ShowInTaskbar = false,
+                WindowState = FormWindowState.Normal,
+                Bounds = screen.Bounds,
+                StartPosition = FormStartPosition.Manual,
+                Size = new Size(screen.Bounds.Width, screen.Bounds.Height),
+                Location = new Point(0, 0),
+            };
+#else
+            Form f = new Form()
+            {
+                AutoScaleMode = AutoScaleMode.Font,
+                BackColor = settings.BackgroundColor,
                 Cursor = Cursors.No,
                 ForeColor = settings.TextColor,
                 FormBorderStyle = FormBorderStyle.None,
                 Name = "MainForm",
                 ShowIcon = false,
                 ShowInTaskbar = false,
-                WindowState = FormWindowState.Maximized,
+                WindowState = FormWindowState.Normal,
                 Bounds = screen.Bounds,
-                StartPosition = FormStartPosition.Manual
+                StartPosition = FormStartPosition.Manual,
+                Size = new Size(screen.Bounds.Width, screen.Bounds.Height),
+                Location = new Point(0, 0),
+                TopLevel = true,
+                TopMost = true
             };
 
-            f.Paint += RegisteredForm_Paint;
-            f.KeyDown += RegisteredForm_KeyDown;
-            f.KeyUp += RegisteredForm_KeyUp;
             f.MouseDown += RegisteredForm_MouseDown;
             f.MouseMove += RegisteredForm_MouseMove;
-            
+#endif
+            f.Paint += RegisteredForm_Paint;
+            f.KeyUp += RegisteredForm_KeyUp;
+            f.KeyDown += RegisteredForm_KeyDown;
+
             return f;
         }
 

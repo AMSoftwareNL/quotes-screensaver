@@ -30,6 +30,7 @@ namespace AMSoftware.Quotes
         public ConfigForm()
         {
             InitializeComponent();
+            this.Text = $"{Application.ProductName} [{Application.ProductVersion}]";
 
             _configSettings = Settings.Default;
 
@@ -51,6 +52,17 @@ namespace AMSoftware.Quotes
 
             backgroundColorTextBox.Text = $"{_configSettings.BackgroundColor.Name}";
             backgroundImageTextBox.Text = _configSettings.BackgroundImagePath;
+
+            backgroundAlignmentComboBox.DataSource = new ArrayList()
+            {
+                Tuple.Create<BackgroundAlignment,string>(BackgroundAlignment.Fit, "Fit"),
+                Tuple.Create<BackgroundAlignment,string>(BackgroundAlignment.Stretch, "Stretch"),
+                Tuple.Create<BackgroundAlignment,string>(BackgroundAlignment.Center, "Center"),
+                Tuple.Create<BackgroundAlignment, string>(BackgroundAlignment.Tile, "Tile"),
+            };
+            backgroundAlignmentComboBox.DisplayMember = "Item2";
+            backgroundAlignmentComboBox.ValueMember = "Item1";
+            backgroundAlignmentComboBox.SelectedValue = (BackgroundAlignment)_configSettings.BackgroundAlignment;
         }
 
         private void FontButton_Click(object sender, EventArgs e)
@@ -88,6 +100,18 @@ namespace AMSoftware.Quotes
             }
         }
 
+        private void BackgroundAlignmentComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (backgroundAlignmentComboBox.SelectedValue != null)
+            {
+                if (backgroundAlignmentComboBox.SelectedValue is BackgroundAlignment)
+                {
+                    _configSettings.BackgroundAlignment = (int)backgroundAlignmentComboBox.SelectedValue;
+                    applyButton.Enabled = true;
+                }
+            }
+        }
+
         private void PathButton_Click(object sender, EventArgs e)
         {
             openFileDialog.Filter = "Quotes XML|*.xml|All files|*.*";
@@ -117,7 +141,7 @@ namespace AMSoftware.Quotes
 
         private void BackgroundImageButton_Click(object sender, EventArgs e)
         {
-            openFileDialog.Filter = "Bitmap files|*.bmp;*.dib|JPEG|*.jpg;*.jpeg;*.jpe;*.jfif|GIF|*.gif|PNG|*.png|All Picture Files|*.bmp;*.dib;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.png|All files|*.*";
+            openFileDialog.Filter = "All Picture Files|*.bmp;*.dib;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.png|Bitmap files|*.bmp;*.dib|JPEG|*.jpg;*.jpeg;*.jpe;*.jfif|GIF|*.gif|PNG|*.png|All files|*.*";
             openFileDialog.Title = "Select background image";
 
             openFileDialog.FileName = _configSettings.BackgroundImagePath;
@@ -181,9 +205,10 @@ namespace AMSoftware.Quotes
                     TextAlignment = (TextAlignment)_configSettings.TextAlignment,
                     TextShrinkToFit = true,
                     BackgroundColor = _configSettings.BackgroundColor,
-                    BackgroundImagePath = _configSettings.BackgroundImagePath
+                    BackgroundImagePath = _configSettings.BackgroundImagePath,
+                    BackgroundAlignment = (BackgroundAlignment)_configSettings.BackgroundAlignment,
                 });
-                renderer.Render(q, g);
+                renderer.Render(q, g, Screen.FromControl(this).Bounds);
             }
         }
 
