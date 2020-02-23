@@ -63,9 +63,9 @@ namespace AMSoftware.Quotes
                 }
                 else if (commandArgument.Equals("/s", StringComparison.InvariantCultureIgnoreCase)) // show screensaver
                 {
-                    QuoteReader reader = InitReader();
+                    QuoteManager manager = InitManager();
                     RenderSettings renderSettings = InitRenderSettings();
-                    Application.Run(new ScreensaverApplicationContext(reader, renderSettings));
+                    Application.Run(new ScreensaverApplicationContext(manager, renderSettings));
                 }
             }
             else // show config non-modal
@@ -76,12 +76,12 @@ namespace AMSoftware.Quotes
 
         private static void RunPreview(int parentHwndArgument)
         {
-            QuoteReader reader = InitReader();
+            QuoteManager manager = InitManager();
             RenderSettings renderSettings = InitRenderSettings();
-            renderSettings.TextShrinkToFit = true;
             QuoteRenderer renderer = new QuoteRenderer(renderSettings);
-            Quote quote = reader?.Read() ?? QuoteReader.Default;
+            renderSettings.TextShrinkToFit = true;
 
+            Quote quote = manager?.ReadRandom() ?? QuoteManager.Default;
             using (Graphics g = Graphics.FromHwnd(new IntPtr(parentHwndArgument)))
             {
                 renderer.Render(quote, g, Screen.FromHandle(new IntPtr(parentHwndArgument)).Bounds);
@@ -110,26 +110,34 @@ namespace AMSoftware.Quotes
                 TextShrinkToFit = Settings.Default.TextShrinkToFit,
                 BackgroundColor = Settings.Default.BackgroundColor,
                 BackgroundImagePath = Settings.Default.BackgroundImagePath,
-                BackgroundAlignment = (BackgroundAlignment)Settings.Default.BackgroundAlignment
+                BackgroundAlignment = (BackgroundAlignment)Settings.Default.BackgroundAlignment,
+                BackgroundOpacity = Settings.Default.BackgroundOpacity
             };
         }
 
-        private static QuoteReader InitReader()
+        private static QuoteManager InitManager()
         {
-            if (string.IsNullOrWhiteSpace(Settings.Default.SourcePath))
+            try
+            {
+                if (string.IsNullOrWhiteSpace(Settings.Default.SourcePath))
+                {
+                    return null;
+                }
+
+                return QuoteManager.Create(Settings.Default.SourcePath);
+            }
+            catch
             {
                 return null;
             }
-
-            return QuoteReader.Create(Settings.Default.SourcePath);
         }
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
 #if DEBUG
-            MessageBox.Show(e.Exception.ToString());
+            MessageBox.Show(e.Exception.ToString(), "Unexpected Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 #else
-            MessageBox.Show(e.Exception.Message);
+            MessageBox.Show(e.Exception.Message, "Unexpected Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 #endif
 
         }

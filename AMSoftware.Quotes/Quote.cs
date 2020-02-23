@@ -17,18 +17,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace AMSoftware.Quotes
 {
     [Serializable]
+    [DataContract]
     public class Quote
     {
+        [DataMember]
         public string Author { get; set; }
+        [DataMember]
         public string Year { get; set; }
+        [DataMember]
+        public string Source { get; set; }
+        [DataMember]
         public string[] QuoteText { get; set; }
     }
 
     [Serializable]
+    [CollectionDataContract]
     public class Quotes : List<Quote>
     {
 

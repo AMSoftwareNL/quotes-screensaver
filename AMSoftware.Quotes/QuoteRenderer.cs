@@ -129,6 +129,16 @@ namespace AMSoftware.Quotes
                 }
                 catch { }
             }
+
+            if (_settings.BackgroundOpacity != 1.00M)
+            {
+                // Alpha ranges from 0 to 255
+                int backgroundAlpha = (int)Math.Round(255M - (255M * _settings.BackgroundOpacity));
+                Color opacityColor = Color.FromArgb(backgroundAlpha, _settings.BackgroundColor);
+                SolidBrush opacityBrush = new SolidBrush(opacityColor);
+
+                g.FillRectangle(opacityBrush, displayBounds);
+            }
         }
 
         private static void DrawBackgroundFitted(Graphics g, Image backgroundImage, RectangleF displayBounds)
@@ -321,6 +331,17 @@ namespace AMSoftware.Quotes
             {
                 authorText = quote.Author;
             }
+            if (!string.IsNullOrWhiteSpace(quote.Source))
+            {
+                if (string.IsNullOrWhiteSpace(authorText))
+                {
+                    authorText = $"{quote.Source}";
+                }
+                else
+                {
+                    authorText += $" ({quote.Source})";
+                }
+            }
             if (!string.IsNullOrWhiteSpace(quote.Year))
             {
                 if (string.IsNullOrWhiteSpace(authorText))
@@ -329,7 +350,7 @@ namespace AMSoftware.Quotes
                 }
                 else
                 {
-                    authorText = string.Format("{0} - {1}", authorText, quote.Year);
+                    authorText += $" - {quote.Year}";
                 }
             }
 

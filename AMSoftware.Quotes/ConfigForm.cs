@@ -34,9 +34,24 @@ namespace AMSoftware.Quotes
 
             _configSettings = Settings.Default;
 
+            // Source
             pathTextBox.Text = _configSettings.SourcePath;
+            if (!string.IsNullOrWhiteSpace(_configSettings.SourcePath))
+            {
+                try
+                {
+                    QuoteManager manager = QuoteManager.Create(openFileDialog.FileName);
+                    editButton.Enabled = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Unexpected Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
 
-            fontTextBox.Text = $"{_configSettings.TextFont.FontFamily.Name}; {_configSettings.TextFont.Style}; {_configSettings.TextColor.Name}";
+            // Font
+            fontTextBox.Text = $"{_configSettings.TextFont.FontFamily.Name}; {_configSettings.TextFont.Style}";
+            textColorTextBox.Text = $"#{_configSettings.TextColor.R:X2}{_configSettings.TextColor.G:X2}{_configSettings.TextColor.B:X2}";
             shrinkToFitCheckBox.Checked = _configSettings.TextShrinkToFit;
 
             alignmentComboBox.DataSource = new ArrayList()
@@ -50,7 +65,8 @@ namespace AMSoftware.Quotes
             alignmentComboBox.ValueMember = "Item1";
             alignmentComboBox.SelectedValue = (TextAlignment)_configSettings.TextAlignment;
 
-            backgroundColorTextBox.Text = $"{_configSettings.BackgroundColor.Name}";
+            // Background
+            backgroundColorTextBox.Text = $"#{_configSettings.BackgroundColor.R:X2}{_configSettings.BackgroundColor.G:X2}{_configSettings.BackgroundColor.B:X2}";
             backgroundImageTextBox.Text = _configSettings.BackgroundImagePath;
 
             backgroundAlignmentComboBox.DataSource = new ArrayList()
@@ -63,24 +79,66 @@ namespace AMSoftware.Quotes
             backgroundAlignmentComboBox.DisplayMember = "Item2";
             backgroundAlignmentComboBox.ValueMember = "Item1";
             backgroundAlignmentComboBox.SelectedValue = (BackgroundAlignment)_configSettings.BackgroundAlignment;
+
+            backgroundOpacityNumericUpDown.Value = _configSettings.BackgroundOpacity; 
         }
 
+        private void PathButton_Click(object sender, EventArgs e)
+        {
+            editButton.Enabled = false;
+
+            openFileDialog.Filter = "Quotes XML|*.xml|Quotes JSON|*.json|All files|*.*";
+            openFileDialog.Title = "Select quoute source";
+
+            openFileDialog.FileName = _configSettings.SourcePath;
+            if (openFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                if (!string.IsNullOrWhiteSpace(openFileDialog.FileName))
+                {
+                    try
+                    {
+                        QuoteManager manager = QuoteManager.Create(openFileDialog.FileName);
+
+                        _configSettings.SourcePath = openFileDialog.FileName;
+                        pathTextBox.Text = _configSettings.SourcePath;
+
+                        applyButton.Enabled = true;
+                        editButton.Enabled = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Unexpected Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        #region Font
         private void FontButton_Click(object sender, EventArgs e)
         {
-            fontDialog.Color = _configSettings.TextColor;
             fontDialog.Font = _configSettings.TextFont;
-
             if (fontDialog.ShowDialog(this) == DialogResult.OK)
             {
                 _configSettings.TextFont = fontDialog.Font;
-                _configSettings.TextColor = fontDialog.Color;
 
-                fontTextBox.Text = $"{_configSettings.TextFont.FontFamily.Name}; {_configSettings.TextFont.Style}; {_configSettings.TextColor.Name}";
+                fontTextBox.Text = $"{_configSettings.TextFont.FontFamily.Name}; {_configSettings.TextFont.Style}";
 
                 applyButton.Enabled = true;
             }
         }
 
+        private void TextColorButton_Click(object sender, EventArgs e)
+        {
+            colorDialog.Color = _configSettings.TextColor;
+            if (colorDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                _configSettings.TextColor = colorDialog.Color;
+                textColorTextBox.Text = $"#{_configSettings.TextColor.R:X2}{_configSettings.TextColor.G:X2}{_configSettings.TextColor.B:X2}";
+
+                applyButton.Enabled = true;
+            }
+        }
+        
         private void ShrinkToFitCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             _configSettings.TextShrinkToFit = shrinkToFitCheckBox.Checked;
@@ -99,7 +157,9 @@ namespace AMSoftware.Quotes
                 }
             }
         }
+        #endregion
 
+        #region Background
         private void BackgroundAlignmentComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (backgroundAlignmentComboBox.SelectedValue != null)
@@ -112,28 +172,13 @@ namespace AMSoftware.Quotes
             }
         }
 
-        private void PathButton_Click(object sender, EventArgs e)
-        {
-            openFileDialog.Filter = "Quotes XML|*.xml|All files|*.*";
-            openFileDialog.Title = "Select quoute source";
-
-            openFileDialog.FileName = _configSettings.SourcePath;
-            if (openFileDialog.ShowDialog(this) == DialogResult.OK)
-            {
-                _configSettings.SourcePath = openFileDialog.FileName;
-                pathTextBox.Text = _configSettings.SourcePath;
-
-                applyButton.Enabled = true;
-            }
-        }
-
         private void BackgroundColorButton_Click(object sender, EventArgs e)
         {
             colorDialog.Color = _configSettings.BackgroundColor;
             if (colorDialog.ShowDialog(this) == DialogResult.OK)
             {
                 _configSettings.BackgroundColor = colorDialog.Color;
-                backgroundColorTextBox.Text = $"{_configSettings.BackgroundColor.Name}";
+                backgroundColorTextBox.Text = $"#{_configSettings.BackgroundColor.R:X2}{_configSettings.BackgroundColor.G:X2}{_configSettings.BackgroundColor.B:X2}";
 
                 applyButton.Enabled = true;
             }
@@ -154,6 +199,15 @@ namespace AMSoftware.Quotes
             }
         }
 
+        private void BackgroundOpacityNumericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            _configSettings.BackgroundOpacity = backgroundOpacityNumericUpDown.Value;
+
+            applyButton.Enabled = true;
+        }
+        #endregion
+
+        #region Form
         private void ApplyButton_Click(object sender, EventArgs e)
         {
             _configSettings.Save();
@@ -173,30 +227,46 @@ namespace AMSoftware.Quotes
             this.Close();
         }
 
-        private void PreviewPanel_Paint(object sender, PaintEventArgs e)
+        private void EditButton_Click(object sender, EventArgs e)
+        {
+            EditForm form = new EditForm()
+            {
+                Manager = QuoteManager.Create(_configSettings.SourcePath)
+            };
+
+            form.ShowDialog(this);
+        }
+
+        private void PreviewButton_Click(object sender, EventArgs e)
+        {
+            Form previewForm = new Form()
+            {
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                StartPosition = FormStartPosition.CenterScreen,
+                WindowState = FormWindowState.Maximized,
+                ShowInTaskbar = false,
+                TopMost = true,
+                Text = $"{this.Text} Preview"
+            };
+            previewForm.Paint += PreviewForm_Paint;
+
+            previewForm.ShowDialog(this);
+        }
+
+        private void PreviewForm_Paint(object sender, PaintEventArgs e)
         {
             Quote q = null;
             if (string.IsNullOrWhiteSpace(_configSettings.SourcePath))
             {
-                q = QuoteReader.Default;
+                q = QuoteManager.Default;
             }
             else
             {
-                QuoteReader reader = QuoteReader.Create(_configSettings.SourcePath);
-                q = reader?.Read() ?? QuoteReader.Default;
+                QuoteManager manager = QuoteManager.Create(_configSettings.SourcePath);
+                q = manager?.ReadRandom() ?? QuoteManager.Default;
             }
 
-            if (!string.IsNullOrWhiteSpace(previewQuoteTextBox.Text))
-            {
-                q = new Quote()
-                {
-                    QuoteText = previewQuoteTextBox.Lines,
-                    Author = previewAuthorTextBox.Text,
-                    Year = previewYearTextBox.Text
-                };
-            }
-
-            using (Graphics g = previewPanel.CreateGraphics())
+            using (Graphics g = e.Graphics)
             {
                 QuoteRenderer renderer = new QuoteRenderer(new RenderSettings()
                 {
@@ -207,22 +277,11 @@ namespace AMSoftware.Quotes
                     BackgroundColor = _configSettings.BackgroundColor,
                     BackgroundImagePath = _configSettings.BackgroundImagePath,
                     BackgroundAlignment = (BackgroundAlignment)_configSettings.BackgroundAlignment,
+                    BackgroundOpacity = _configSettings.BackgroundOpacity
                 });
                 renderer.Render(q, g, Screen.FromControl(this).Bounds);
             }
         }
-
-        private void ConfigurationTabControl_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (configurationTabControl.SelectedTab.Name == "previewTabPage")
-            {
-                previewPanel.Refresh();
-            }
-        }
-
-        private void PreviewTextBox_Leave(object sender, EventArgs e)
-        {
-            previewPanel.Refresh();
-        }
+        #endregion
     }
 }

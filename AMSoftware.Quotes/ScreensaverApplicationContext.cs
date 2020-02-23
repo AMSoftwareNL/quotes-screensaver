@@ -26,12 +26,12 @@ namespace AMSoftware.Quotes
         private Quote _quote = null;
         private readonly Form[] _forms = null;
         private readonly QuoteRenderer _renderer;
-        private readonly QuoteReader _reader;
+        private readonly QuoteManager _manager;
 
-        public ScreensaverApplicationContext(QuoteReader reader, RenderSettings settings) : base()
+        public ScreensaverApplicationContext(QuoteManager manager, RenderSettings settings) : base()
         {
             _renderer = new QuoteRenderer(settings);
-            _reader = reader;
+            _manager = manager;
 
             SetQuote();
 
@@ -94,7 +94,7 @@ namespace AMSoftware.Quotes
 
         private void SetQuote()
         {
-            _quote = _reader?.Read() ?? QuoteReader.Default;
+            _quote = _manager?.ReadRandom() ?? QuoteManager.Default;
 
             if (_forms != null)
             {
