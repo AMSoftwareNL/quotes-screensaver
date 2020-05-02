@@ -6,7 +6,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="TextFont" Type="System.Drawing.Font" Scope="User">
-      <Value Profile="(Default)">Segoe UI Semibold, 12pt</Value>
+      <Value Profile="(Default)">Segoe UI Semibold, 76pt</Value>
     </Setting>
     <Setting Name="TextColor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">WhiteSmoke</Value>
@@ -18,7 +18,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="TextShrinkToFit" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="BackgroundImagePath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -26,7 +26,7 @@
     <Setting Name="BackgroundAlignment" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="BackgroundOpacity" Type="System.Double" Scope="User">
+    <Setting Name="BackgroundOpacity" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
   </Settings>

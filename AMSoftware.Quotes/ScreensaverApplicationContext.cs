@@ -45,49 +45,44 @@ namespace AMSoftware.Quotes
 
         private Form InitScreen(Screen screen, RenderSettings settings)
         {
-#if DEBUG
-            Form f = new Form()
-            {
-                AutoScaleMode = AutoScaleMode.Font,
-                BackColor = settings.BackgroundColor,
-                Cursor = Cursors.No,
-                ForeColor = settings.TextColor,
-                FormBorderStyle = FormBorderStyle.Sizable,
-                Name = "MainForm",
-                ShowIcon = false,
-                ShowInTaskbar = false,
-                WindowState = FormWindowState.Normal,
-                Bounds = screen.Bounds,
-                StartPosition = FormStartPosition.Manual,
-                Size = new Size(screen.Bounds.Width, screen.Bounds.Height),
-                Location = new Point(0, 0),
-            };
-#else
-            Form f = new Form()
-            {
-                AutoScaleMode = AutoScaleMode.Font,
-                BackColor = settings.BackgroundColor,
-                Cursor = Cursors.No,
-                ForeColor = settings.TextColor,
-                FormBorderStyle = FormBorderStyle.None,
-                Name = "MainForm",
-                ShowIcon = false,
-                ShowInTaskbar = false,
-                WindowState = FormWindowState.Normal,
-                Bounds = screen.Bounds,
-                StartPosition = FormStartPosition.Manual,
-                Size = new Size(screen.Bounds.Width, screen.Bounds.Height),
-                Location = new Point(0, 0),
-                TopLevel = true,
-                TopMost = true
-            };
+            PictureBox pictureBox1 = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).BeginInit();
+
+            pictureBox1.BackColor = Color.Transparent;
+            pictureBox1.Dock = DockStyle.Fill;
+            pictureBox1.Location = new Point(0, 0);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Paint += PictureBox_Paint;
+
+            Form f = new Form();
+            f.AutoScaleMode = AutoScaleMode.Font;
+            f.BackColor = settings.BackgroundColor;
+            f.Cursor = Cursors.No;
+            f.ForeColor = settings.TextColor;
+            f.FormBorderStyle = FormBorderStyle.Sizable;
+            f.Name = "MainForm";
+            f.ShowIcon = false;
+            f.ShowInTaskbar = false;
+            f.WindowState = FormWindowState.Normal;
+            f.Bounds = screen.Bounds;
+            f.StartPosition = FormStartPosition.Manual;
+            f.Size = new Size(screen.Bounds.Width, screen.Bounds.Height);
+            f.Location = new Point(0, 0);
+            f.Controls.Add(pictureBox1);
+#if !DEBUG
+            f.FormBorderStyle = FormBorderStyle.None;
+            f.TopLevel = true;
+            f.TopMost = true;
 
             f.MouseDown += RegisteredForm_MouseDown;
             f.MouseMove += RegisteredForm_MouseMove;
+            
 #endif
-            f.Paint += RegisteredForm_Paint;
             f.KeyUp += RegisteredForm_KeyUp;
-            f.KeyDown += RegisteredForm_KeyDown;
+            f.KeyDown += RegisteredForm_KeyDown; 
+            f.Paint += RegisteredForm_Paint;
+
+            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).EndInit();
 
             return f;
         }
@@ -100,7 +95,7 @@ namespace AMSoftware.Quotes
             {
                 foreach (Form item in _forms)
                 {
-                    item.Refresh();
+                    item.Controls[0].Invalidate();
                 }
             }
         }
@@ -141,7 +136,12 @@ namespace AMSoftware.Quotes
 
         private void RegisteredForm_Paint(object sender, PaintEventArgs e)
         {
-            _renderer.Render(_quote, e.Graphics);
+            _renderer.RenderBackground(e.Graphics, (sender as Form).ClientRectangle);
+        }
+
+        private void PictureBox_Paint(object sender, PaintEventArgs e)
+        {
+            _renderer.RenderText(_quote, e.Graphics, (sender as PictureBox).ClientRectangle);
         }
 
         protected override void Dispose(bool disposing)

@@ -19,6 +19,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace AMSoftware.Quotes
 {
@@ -31,41 +32,26 @@ namespace AMSoftware.Quotes
             _settings = settings;
         }
 
-        public void Render(Quote q, Graphics g)
-        {
-            RectangleF clipBounds = g.VisibleClipBounds;
-
-            RenderBackground(g, clipBounds);
-            RenderText(q, g, clipBounds);
-
-            g.Flush(FlushIntention.Flush);
-        }
-
-        public void Render(Quote q, Graphics g, RectangleF measureBounds)
-        {
-            g.ScaleTransform(
-                g.VisibleClipBounds.Width / measureBounds.Width,
-                g.VisibleClipBounds.Height / measureBounds.Height,
-                MatrixOrder.Append);
-
-            RenderBackground(g, measureBounds);
-            RenderText(q, g, measureBounds);
-
-            g.Flush(FlushIntention.Flush);
-        }
-
-        private void RenderText(Quote q, Graphics g, RectangleF displayBounds)
+        public void RenderText(Quote q, Graphics g, RectangleF measureBounds)
         {
             if (q == null) return;
 
+            g.SmoothingMode = SmoothingMode.HighQuality;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            g.InterpolationMode = InterpolationMode.HighQualityBilinear;
+
+            g.ScaleTransform(
+                g.VisibleClipBounds.Width / measureBounds.Width,
+                g.VisibleClipBounds.Height / measureBounds.Height);
+
             // Set a margin of 5%
-            float marginLeft = displayBounds.Width * 0.05F;
-            float marginTop = displayBounds.Height * 0.05F;
+            float marginLeft = measureBounds.Width * 0.05F;
+            float marginTop = measureBounds.Height * 0.05F;
             RectangleF layoutArea = new RectangleF(
                 marginLeft,
                 marginTop,
-                displayBounds.Width - (2.0F * marginLeft),
-                displayBounds.Height - (2.0F * marginTop)
+                measureBounds.Width - (2.0F * marginLeft),
+                measureBounds.Height - (2.0F * marginTop)
             );
 
             // Print author and year of quote.
@@ -99,8 +85,16 @@ namespace AMSoftware.Quotes
             }
         }
 
-        private void RenderBackground(Graphics g, RectangleF displayBounds)
+        public void RenderBackground(Graphics g, RectangleF measureBounds)
         {
+            g.SmoothingMode = SmoothingMode.HighQuality;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            g.InterpolationMode = InterpolationMode.HighQualityBilinear;
+
+            g.ScaleTransform(
+                g.VisibleClipBounds.Width / measureBounds.Width,
+                g.VisibleClipBounds.Height / measureBounds.Height);
+
             g.Clear(_settings.BackgroundColor);
 
             if (!string.IsNullOrWhiteSpace(_settings.BackgroundImagePath))
@@ -112,16 +106,16 @@ namespace AMSoftware.Quotes
                     switch (_settings.BackgroundAlignment)
                     {
                         case BackgroundAlignment.Fit:
-                            DrawBackgroundFitted(g, backgroundImage, displayBounds);
+                            DrawBackgroundFitted(g, backgroundImage, measureBounds);
                             break;
                         case BackgroundAlignment.Stretch:
-                            DrawBackgroundStretched(g, backgroundImage, displayBounds);
+                            DrawBackgroundStretched(g, backgroundImage, measureBounds);
                             break;
                         case BackgroundAlignment.Center:
-                            DrawBackgroundCentered(g, backgroundImage, displayBounds);
+                            DrawBackgroundCentered(g, backgroundImage, measureBounds);
                             break;
                         case BackgroundAlignment.Tile:
-                            DrawBackgroundTiled(g, backgroundImage, displayBounds);
+                            DrawBackgroundTiled(g, backgroundImage, measureBounds);
                             break;
                         default:
                             break;
@@ -137,7 +131,7 @@ namespace AMSoftware.Quotes
                 Color opacityColor = Color.FromArgb(backgroundAlpha, _settings.BackgroundColor);
                 SolidBrush opacityBrush = new SolidBrush(opacityColor);
 
-                g.FillRectangle(opacityBrush, displayBounds);
+                g.FillRectangle(opacityBrush, measureBounds);
             }
         }
 

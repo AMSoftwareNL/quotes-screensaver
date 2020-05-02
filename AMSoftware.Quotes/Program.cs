@@ -30,10 +30,10 @@ namespace AMSoftware.Quotes
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Application.ThreadException += Application_ThreadException;
-
 #if DEBUG
             System.Diagnostics.Debugger.Launch();
+#else
+            Application.ThreadException += Application_ThreadException;
 #endif
 
             if (args.Length > 0)
@@ -79,12 +79,12 @@ namespace AMSoftware.Quotes
             QuoteManager manager = InitManager();
             RenderSettings renderSettings = InitRenderSettings();
             QuoteRenderer renderer = new QuoteRenderer(renderSettings);
-            renderSettings.TextShrinkToFit = true;
 
             Quote quote = manager?.ReadRandom() ?? QuoteManager.Default;
             using (Graphics g = Graphics.FromHwnd(new IntPtr(parentHwndArgument)))
             {
-                renderer.Render(quote, g, Screen.FromHandle(new IntPtr(parentHwndArgument)).Bounds);
+                renderer.RenderBackground(g, Screen.PrimaryScreen.Bounds);
+                renderer.RenderText(quote, g, Screen.PrimaryScreen.Bounds);
             }
         }
 
@@ -134,12 +134,7 @@ namespace AMSoftware.Quotes
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-#if DEBUG
-            MessageBox.Show(e.Exception.ToString(), "Unexpected Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-#else
             MessageBox.Show(e.Exception.Message, "Unexpected Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-#endif
-
         }
     }
 }

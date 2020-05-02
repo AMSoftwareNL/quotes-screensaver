@@ -20,6 +20,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections;
+using System.IO;
 
 namespace AMSoftware.Quotes
 {
@@ -40,7 +41,7 @@ namespace AMSoftware.Quotes
             {
                 try
                 {
-                    QuoteManager manager = QuoteManager.Create(openFileDialog.FileName);
+                    QuoteManager manager = QuoteManager.Create(_configSettings.SourcePath);
                     editButton.Enabled = true;
                 }
                 catch (Exception ex)
@@ -80,7 +81,7 @@ namespace AMSoftware.Quotes
             backgroundAlignmentComboBox.ValueMember = "Item1";
             backgroundAlignmentComboBox.SelectedValue = (BackgroundAlignment)_configSettings.BackgroundAlignment;
 
-            backgroundOpacityNumericUpDown.Value = _configSettings.BackgroundOpacity; 
+            backgroundOpacityNumericUpDown.Value = _configSettings.BackgroundOpacity;
         }
 
         private void PathButton_Click(object sender, EventArgs e)
@@ -90,7 +91,20 @@ namespace AMSoftware.Quotes
             openFileDialog.Filter = "Quotes XML|*.xml|Quotes JSON|*.json|All files|*.*";
             openFileDialog.Title = "Select quoute source";
 
-            openFileDialog.FileName = _configSettings.SourcePath;
+            if (!string.IsNullOrWhiteSpace(_configSettings.SourcePath))
+            {
+                openFileDialog.FileName = Path.GetFileName(_configSettings.SourcePath);
+                openFileDialog.InitialDirectory = Path.GetDirectoryName(_configSettings.SourcePath);
+                openFileDialog.DefaultExt = Path.GetExtension(_configSettings.SourcePath);
+                if (string.Equals(Path.GetExtension(_configSettings.SourcePath), ".xml", StringComparison.OrdinalIgnoreCase))
+                {
+                    openFileDialog.FilterIndex = 1;
+                }
+                else
+                {
+                    openFileDialog.FilterIndex = 2;
+                }
+            }
             if (openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 if (!string.IsNullOrWhiteSpace(openFileDialog.FileName))
@@ -138,7 +152,7 @@ namespace AMSoftware.Quotes
                 applyButton.Enabled = true;
             }
         }
-        
+
         private void ShrinkToFitCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             _configSettings.TextShrinkToFit = shrinkToFitCheckBox.Checked;
@@ -189,7 +203,13 @@ namespace AMSoftware.Quotes
             openFileDialog.Filter = "All Picture Files|*.bmp;*.dib;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.png|Bitmap files|*.bmp;*.dib|JPEG|*.jpg;*.jpeg;*.jpe;*.jfif|GIF|*.gif|PNG|*.png|All files|*.*";
             openFileDialog.Title = "Select background image";
 
-            openFileDialog.FileName = _configSettings.BackgroundImagePath;
+            if (!string.IsNullOrWhiteSpace(_configSettings.BackgroundImagePath))
+            {
+                openFileDialog.FileName = Path.GetFileName(_configSettings.BackgroundImagePath);
+                openFileDialog.InitialDirectory = Path.GetDirectoryName(_configSettings.BackgroundImagePath);
+                openFileDialog.DefaultExt = Path.GetExtension(_configSettings.BackgroundImagePath);
+                openFileDialog.FilterIndex = 1;
+            }
             if (openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 _configSettings.BackgroundImagePath = openFileDialog.FileName;
@@ -239,21 +259,47 @@ namespace AMSoftware.Quotes
 
         private void PreviewButton_Click(object sender, EventArgs e)
         {
-            Form previewForm = new Form()
-            {
-                FormBorderStyle = FormBorderStyle.FixedDialog,
-                StartPosition = FormStartPosition.CenterScreen,
-                WindowState = FormWindowState.Maximized,
-                ShowInTaskbar = false,
-                TopMost = true,
-                Text = $"{this.Text} Preview"
-            };
-            previewForm.Paint += PreviewForm_Paint;
+            PictureBox pictureBox1 = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).BeginInit();
+
+            pictureBox1.BackColor = Color.Transparent;
+            pictureBox1.Dock = DockStyle.Fill;
+            pictureBox1.Location = new Point(0, 0);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Paint += new PaintEventHandler(this.PictureBox_Paint);
+
+            Form previewForm = new Form();
+            previewForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+            previewForm.StartPosition = FormStartPosition.CenterScreen;
+            previewForm.WindowState = FormWindowState.Maximized;
+            previewForm.ShowInTaskbar = false;
+            //previewForm.TopMost = true,
+            previewForm.Text = $"{this.Text} Preview";
+            previewForm.Controls.Add(pictureBox1);
+            previewForm.Paint += new PaintEventHandler(this.PreviewForm_Paint);
+
+            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).EndInit();
 
             previewForm.ShowDialog(this);
         }
 
         private void PreviewForm_Paint(object sender, PaintEventArgs e)
+        {
+            QuoteRenderer renderer = new QuoteRenderer(new RenderSettings()
+            {
+                TextFont = _configSettings.TextFont,
+                TextColor = _configSettings.TextColor,
+                TextAlignment = (TextAlignment)_configSettings.TextAlignment,
+                TextShrinkToFit = true,
+                BackgroundColor = _configSettings.BackgroundColor,
+                BackgroundImagePath = _configSettings.BackgroundImagePath,
+                BackgroundAlignment = (BackgroundAlignment)_configSettings.BackgroundAlignment,
+                BackgroundOpacity = _configSettings.BackgroundOpacity
+            });
+            renderer.RenderBackground(e.Graphics, (sender as Form).ClientRectangle);
+        }
+
+        private void PictureBox_Paint(object sender, PaintEventArgs e)
         {
             Quote q = null;
             if (string.IsNullOrWhiteSpace(_configSettings.SourcePath))
@@ -266,21 +312,18 @@ namespace AMSoftware.Quotes
                 q = manager?.ReadRandom() ?? QuoteManager.Default;
             }
 
-            using (Graphics g = e.Graphics)
+            QuoteRenderer renderer = new QuoteRenderer(new RenderSettings()
             {
-                QuoteRenderer renderer = new QuoteRenderer(new RenderSettings()
-                {
-                    TextFont = _configSettings.TextFont,
-                    TextColor = _configSettings.TextColor,
-                    TextAlignment = (TextAlignment)_configSettings.TextAlignment,
-                    TextShrinkToFit = true,
-                    BackgroundColor = _configSettings.BackgroundColor,
-                    BackgroundImagePath = _configSettings.BackgroundImagePath,
-                    BackgroundAlignment = (BackgroundAlignment)_configSettings.BackgroundAlignment,
-                    BackgroundOpacity = _configSettings.BackgroundOpacity
-                });
-                renderer.Render(q, g, Screen.FromControl(this).Bounds);
-            }
+                TextFont = _configSettings.TextFont,
+                TextColor = _configSettings.TextColor,
+                TextAlignment = (TextAlignment)_configSettings.TextAlignment,
+                TextShrinkToFit = true,
+                BackgroundColor = _configSettings.BackgroundColor,
+                BackgroundImagePath = _configSettings.BackgroundImagePath,
+                BackgroundAlignment = (BackgroundAlignment)_configSettings.BackgroundAlignment,
+                BackgroundOpacity = _configSettings.BackgroundOpacity
+            });
+            renderer.RenderText(q, e.Graphics, (sender as PictureBox).ClientRectangle);
         }
         #endregion
     }

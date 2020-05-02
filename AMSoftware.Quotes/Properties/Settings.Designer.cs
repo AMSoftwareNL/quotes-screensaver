@@ -37,7 +37,7 @@ namespace AMSoftware.Quotes.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI Semibold, 12pt")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI Semibold, 76pt")]
         public global::System.Drawing.Font TextFont {
             get {
                 return ((global::System.Drawing.Font)(this["TextFont"]));
@@ -85,7 +85,7 @@ namespace AMSoftware.Quotes.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool TextShrinkToFit {
             get {
                 return ((bool)(this["TextShrinkToFit"]));
