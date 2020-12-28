@@ -7,7 +7,7 @@
     <ProjectGuid>{E9F0DB6F-C6A9-46C9-9220-2EAF0B0FDD15}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AMSoftware.Quotes</RootNamespace>
+    <RootNamespace>AMSoftware.QuotesScreensaver</RootNamespace>
     <AssemblyName>Quotes</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -54,7 +54,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>AMSoftware.Quotes.Program</StartupObject>
+    <StartupObject>AMSoftware.QuotesScreensaver.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -89,9 +93,8 @@
     <Compile Include="Quote.cs" />
     <Compile Include="QuoteManager.cs" />
     <Compile Include="QuoteRenderer.cs" />
+    <Compile Include="QuotesScreensaver.cs" />
     <Compile Include="RenderSettings.cs" />
-    <Compile Include="ScreensaverApplicationContext.cs" />
-    <Compile Include="_enums.cs" />
     <EmbeddedResource Include="ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -102,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -120,6 +124,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup />
+  <Import Project="..\ScreensaverBase\ScreensaverBase.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>COPY /Y "$(TargetPath)" "$(TargetDir)$(TargetName).scr"</PostBuildEvent>

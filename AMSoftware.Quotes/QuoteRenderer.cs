@@ -1,6 +1,6 @@
 ﻿/*
 Quotes Screensaver
-Copyright (C) 2018 Arjan Meskers / AMSoftware
+Copyright (C) 2020 Arjan Meskers / AMSoftware
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace AMSoftware.Quotes
+namespace AMSoftware.QuotesScreensaver
 {
     internal class QuoteRenderer
     {
@@ -32,42 +32,26 @@ namespace AMSoftware.Quotes
             _settings = settings;
         }
 
-        public void RenderText(Quote q, Graphics g, RectangleF measureBounds)
+        public void RenderText(Quote q, Graphics g, RectangleF bounds)
         {
             if (q == null) return;
 
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            g.InterpolationMode = InterpolationMode.HighQualityBilinear;
-
-            g.ScaleTransform(
-                g.VisibleClipBounds.Width / measureBounds.Width,
-                g.VisibleClipBounds.Height / measureBounds.Height);
-
             // Set a margin of 5%
-            float marginLeft = measureBounds.Width * 0.05F;
-            float marginTop = measureBounds.Height * 0.05F;
+            float marginLeft = bounds.Width * 0.05F;
+            float marginTop = bounds.Height * 0.05F;
             RectangleF layoutArea = new RectangleF(
                 marginLeft,
                 marginTop,
-                measureBounds.Width - (2.0F * marginLeft),
-                measureBounds.Height - (2.0F * marginTop)
+                bounds.Width - (2.0F * marginLeft),
+                bounds.Height - (2.0F * marginTop)
             );
 
             // Print author and year of quote.
-            // Textsize is 2.5% of bound height. Independent of selected fontsize.
-            Font authorFont = new Font(_settings.TextFont.FontFamily, layoutArea.Height * 0.025F, FontStyle.Italic);
-            DrawAuthorText(BuildAuthorText(q), g, authorFont, _settings.TextColor, layoutArea);
+            DrawAuthorText(BuildAuthorText(q), g, _settings.TextFont, _settings.TextColor, layoutArea);
 
-            // Check if text fits in layout area with current font settings.
-            // Else shrink font to fit to layout area.
+            // Size font to fit the screen. Selected size for font is ignored
             // Use quote as one string, as alignment doesn't matter.
-            Font textFont = _settings.TextFont;
-            if (_settings.TextShrinkToFit)
-            {
-                textFont = GetFittedFont(string.Join("\n", q.QuoteText), g, textFont, layoutArea);
-            }
-
+            Font textFont = GetFittedFont(string.Join("\n", q.QuoteText), g, _settings.TextFont, layoutArea);
             if (_settings.TextAlignment != TextAlignment.Auto)
             {
                 DrawAlignedQuoteText(string.Join("\n", q.QuoteText), g, textFont, _settings.TextColor, _settings.TextAlignment, layoutArea);
@@ -85,16 +69,8 @@ namespace AMSoftware.Quotes
             }
         }
 
-        public void RenderBackground(Graphics g, RectangleF measureBounds)
+        public void RenderBackground(Graphics g, RectangleF bounds)
         {
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            g.InterpolationMode = InterpolationMode.HighQualityBilinear;
-
-            g.ScaleTransform(
-                g.VisibleClipBounds.Width / measureBounds.Width,
-                g.VisibleClipBounds.Height / measureBounds.Height);
-
             g.Clear(_settings.BackgroundColor);
 
             if (!string.IsNullOrWhiteSpace(_settings.BackgroundImagePath))
@@ -106,16 +82,16 @@ namespace AMSoftware.Quotes
                     switch (_settings.BackgroundAlignment)
                     {
                         case BackgroundAlignment.Fit:
-                            DrawBackgroundFitted(g, backgroundImage, measureBounds);
+                            DrawBackgroundFitted(g, backgroundImage, bounds);
                             break;
                         case BackgroundAlignment.Stretch:
-                            DrawBackgroundStretched(g, backgroundImage, measureBounds);
+                            DrawBackgroundStretched(g, backgroundImage, bounds);
                             break;
                         case BackgroundAlignment.Center:
-                            DrawBackgroundCentered(g, backgroundImage, measureBounds);
+                            DrawBackgroundCentered(g, backgroundImage, bounds);
                             break;
                         case BackgroundAlignment.Tile:
-                            DrawBackgroundTiled(g, backgroundImage, measureBounds);
+                            DrawBackgroundTiled(g, backgroundImage, bounds);
                             break;
                         default:
                             break;
@@ -131,16 +107,16 @@ namespace AMSoftware.Quotes
                 Color opacityColor = Color.FromArgb(backgroundAlpha, _settings.BackgroundColor);
                 SolidBrush opacityBrush = new SolidBrush(opacityColor);
 
-                g.FillRectangle(opacityBrush, measureBounds);
+                g.FillRectangle(opacityBrush, bounds);
             }
         }
-
+        
         private static void DrawBackgroundFitted(Graphics g, Image backgroundImage, RectangleF displayBounds)
         {
             float ratioScreen = displayBounds.Width / displayBounds.Height;
             float ratioImage = (float)backgroundImage.Width / (float)backgroundImage.Height;
 
-            if (ratioScreen > ratioImage)
+            if (ratioScreen < ratioImage)
             {
                 float width = displayBounds.Height * ratioImage;
                 RectangleF destRectangle = new RectangleF(
@@ -165,7 +141,7 @@ namespace AMSoftware.Quotes
             float ratioScreen = displayBounds.Width / displayBounds.Height;
             float ratioImage = (float)backgroundImage.Width / (float)backgroundImage.Height;
 
-            if (ratioScreen > ratioImage)
+            if (ratioScreen < ratioImage)
             {
                 float height = backgroundImage.Width / ratioScreen;
                 RectangleF srcRectangle = new RectangleF(
@@ -221,31 +197,25 @@ namespace AMSoftware.Quotes
         private static Font GetFittedFont(string text, Graphics g, Font textFont, RectangleF area)
         {
             SizeF textSize = g.MeasureString(text, textFont);
-            if (textSize.Width > area.Width || textSize.Height > area.Height)
+            // Text to large determine shrink factor
+            float shrinkFactorHeight = area.Height / textSize.Height;
+            float shrinkFactorWidth = area.Width / textSize.Width;
+
+            if (shrinkFactorHeight < shrinkFactorWidth)
             {
-                // Text to large determine shrink factor
-                float shrinkFactorHeight = area.Height / textSize.Height;
-                float shrinkFactorWidth = area.Width / textSize.Width;
-
-                if (shrinkFactorHeight < shrinkFactorWidth)
-                {
-                    return new Font(textFont.FontFamily, textFont.Size * shrinkFactorHeight, textFont.Style);
-                }
-                else
-                {
-                    return new Font(textFont.FontFamily, textFont.Size * shrinkFactorWidth, textFont.Style);
-                }
-
+                return new Font(textFont.FontFamily, textFont.Size * shrinkFactorHeight, textFont.Style);
             }
             else
             {
-                return textFont;
+                return new Font(textFont.FontFamily, textFont.Size * shrinkFactorWidth, textFont.Style);
             }
         }
 
         private static void DrawAuthorText(string text, Graphics g, Font textFont, Color textColor, RectangleF layoutArea)
         {
-            g.DrawString(text, textFont, new SolidBrush(textColor), layoutArea, new StringFormat()
+            // Textsize is 2.5% of bound height. Independent of selected fontsize.
+            Font authorFont = new Font(textFont.FontFamily, layoutArea.Height * 0.025F, FontStyle.Italic);
+            g.DrawString(text, authorFont, new SolidBrush(textColor), layoutArea, new StringFormat()
             {
                 Alignment = StringAlignment.Far,
                 LineAlignment = StringAlignment.Far

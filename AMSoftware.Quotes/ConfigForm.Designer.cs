@@ -1,6 +1,6 @@
 ﻿/*
 Quotes Screensaver
-Copyright (C) 2018 Arjan Meskers / AMSoftware
+Copyright (C) 2020 Arjan Meskers / AMSoftware
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-namespace AMSoftware.Quotes
+namespace AMSoftware.QuotesScreensaver
 {
     partial class ConfigForm
     {
@@ -65,7 +65,6 @@ namespace AMSoftware.Quotes
             this.textColorLabel = new System.Windows.Forms.Label();
             this.textColorButton = new System.Windows.Forms.Button();
             this.textColorTextBox = new System.Windows.Forms.TextBox();
-            this.shrinkToFitCheckBox = new System.Windows.Forms.CheckBox();
             this.alignmentComboBox = new System.Windows.Forms.ComboBox();
             this.alignmentLabel = new System.Windows.Forms.Label();
             this.fontTextBox = new System.Windows.Forms.TextBox();
@@ -163,7 +162,7 @@ namespace AMSoftware.Quotes
             this.backgroundGroupBox.Controls.Add(this.backgroundImageTextBox);
             this.backgroundGroupBox.Controls.Add(this.backgroundColorButton);
             this.backgroundGroupBox.Controls.Add(this.backgroundColorTextBox);
-            this.backgroundGroupBox.Location = new System.Drawing.Point(13, 265);
+            this.backgroundGroupBox.Location = new System.Drawing.Point(13, 220);
             this.backgroundGroupBox.Margin = new System.Windows.Forms.Padding(4);
             this.backgroundGroupBox.Name = "backgroundGroupBox";
             this.backgroundGroupBox.Padding = new System.Windows.Forms.Padding(4);
@@ -177,7 +176,7 @@ namespace AMSoftware.Quotes
             this.backgroundOpacityLabel.AutoSize = true;
             this.backgroundOpacityLabel.Location = new System.Drawing.Point(8, 130);
             this.backgroundOpacityLabel.Name = "backgroundOpacityLabel";
-            this.backgroundOpacityLabel.Size = new System.Drawing.Size(47, 15);
+            this.backgroundOpacityLabel.Size = new System.Drawing.Size(56, 17);
             this.backgroundOpacityLabel.TabIndex = 24;
             this.backgroundOpacityLabel.Text = "Opacity";
             // 
@@ -196,7 +195,7 @@ namespace AMSoftware.Quotes
             0,
             0});
             this.backgroundOpacityNumericUpDown.Name = "backgroundOpacityNumericUpDown";
-            this.backgroundOpacityNumericUpDown.Size = new System.Drawing.Size(316, 20);
+            this.backgroundOpacityNumericUpDown.Size = new System.Drawing.Size(316, 22);
             this.backgroundOpacityNumericUpDown.TabIndex = 15;
             this.backgroundOpacityNumericUpDown.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
             this.backgroundOpacityNumericUpDown.ValueChanged += new System.EventHandler(this.BackgroundOpacityNumericUpDown_ValueChanged);
@@ -221,7 +220,7 @@ namespace AMSoftware.Quotes
             this.backgroundAlignmentLabel.AutoSize = true;
             this.backgroundAlignmentLabel.Location = new System.Drawing.Point(8, 94);
             this.backgroundAlignmentLabel.Name = "backgroundAlignmentLabel";
-            this.backgroundAlignmentLabel.Size = new System.Drawing.Size(62, 15);
+            this.backgroundAlignmentLabel.Size = new System.Drawing.Size(70, 17);
             this.backgroundAlignmentLabel.TabIndex = 23;
             this.backgroundAlignmentLabel.Text = "Alignment";
             // 
@@ -231,7 +230,7 @@ namespace AMSoftware.Quotes
             this.backgroundImageLabel.Location = new System.Drawing.Point(8, 62);
             this.backgroundImageLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.backgroundImageLabel.Name = "backgroundImageLabel";
-            this.backgroundImageLabel.Size = new System.Drawing.Size(42, 15);
+            this.backgroundImageLabel.Size = new System.Drawing.Size(46, 17);
             this.backgroundImageLabel.TabIndex = 22;
             this.backgroundImageLabel.Text = "Image";
             // 
@@ -241,7 +240,7 @@ namespace AMSoftware.Quotes
             this.backgroundColorLabel.Location = new System.Drawing.Point(8, 27);
             this.backgroundColorLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.backgroundColorLabel.Name = "backgroundColorLabel";
-            this.backgroundColorLabel.Size = new System.Drawing.Size(36, 15);
+            this.backgroundColorLabel.Size = new System.Drawing.Size(41, 17);
             this.backgroundColorLabel.TabIndex = 21;
             this.backgroundColorLabel.Text = "Color";
             // 
@@ -263,7 +262,7 @@ namespace AMSoftware.Quotes
             this.backgroundImageTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.backgroundImageTextBox.Name = "backgroundImageTextBox";
             this.backgroundImageTextBox.ReadOnly = true;
-            this.backgroundImageTextBox.Size = new System.Drawing.Size(279, 20);
+            this.backgroundImageTextBox.Size = new System.Drawing.Size(279, 22);
             this.backgroundImageTextBox.TabIndex = 13;
             this.backgroundImageTextBox.TabStop = false;
             // 
@@ -285,7 +284,7 @@ namespace AMSoftware.Quotes
             this.backgroundColorTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.backgroundColorTextBox.Name = "backgroundColorTextBox";
             this.backgroundColorTextBox.ReadOnly = true;
-            this.backgroundColorTextBox.Size = new System.Drawing.Size(279, 20);
+            this.backgroundColorTextBox.Size = new System.Drawing.Size(279, 22);
             this.backgroundColorTextBox.TabIndex = 11;
             this.backgroundColorTextBox.TabStop = false;
             // 
@@ -294,17 +293,16 @@ namespace AMSoftware.Quotes
             this.textGroupBox.Controls.Add(this.textColorLabel);
             this.textGroupBox.Controls.Add(this.textColorButton);
             this.textGroupBox.Controls.Add(this.textColorTextBox);
-            this.textGroupBox.Controls.Add(this.shrinkToFitCheckBox);
             this.textGroupBox.Controls.Add(this.alignmentComboBox);
             this.textGroupBox.Controls.Add(this.alignmentLabel);
             this.textGroupBox.Controls.Add(this.fontTextBox);
             this.textGroupBox.Controls.Add(this.fontLabel);
             this.textGroupBox.Controls.Add(this.fontButton);
-            this.textGroupBox.Location = new System.Drawing.Point(13, 95);
+            this.textGroupBox.Location = new System.Drawing.Point(13, 87);
             this.textGroupBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.textGroupBox.Name = "textGroupBox";
             this.textGroupBox.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.textGroupBox.Size = new System.Drawing.Size(428, 151);
+            this.textGroupBox.Size = new System.Drawing.Size(428, 124);
             this.textGroupBox.TabIndex = 11;
             this.textGroupBox.TabStop = false;
             this.textGroupBox.Text = "Text";
@@ -315,7 +313,7 @@ namespace AMSoftware.Quotes
             this.textColorLabel.Location = new System.Drawing.Point(8, 62);
             this.textColorLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.textColorLabel.Name = "textColorLabel";
-            this.textColorLabel.Size = new System.Drawing.Size(36, 15);
+            this.textColorLabel.Size = new System.Drawing.Size(41, 17);
             this.textColorLabel.TabIndex = 24;
             this.textColorLabel.Text = "Color";
             // 
@@ -337,21 +335,9 @@ namespace AMSoftware.Quotes
             this.textColorTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.textColorTextBox.Name = "textColorTextBox";
             this.textColorTextBox.ReadOnly = true;
-            this.textColorTextBox.Size = new System.Drawing.Size(279, 20);
+            this.textColorTextBox.Size = new System.Drawing.Size(279, 22);
             this.textColorTextBox.TabIndex = 22;
             this.textColorTextBox.TabStop = false;
-            // 
-            // shrinkToFitCheckBox
-            // 
-            this.shrinkToFitCheckBox.AutoSize = true;
-            this.shrinkToFitCheckBox.Location = new System.Drawing.Point(103, 119);
-            this.shrinkToFitCheckBox.Margin = new System.Windows.Forms.Padding(4);
-            this.shrinkToFitCheckBox.Name = "shrinkToFitCheckBox";
-            this.shrinkToFitCheckBox.Size = new System.Drawing.Size(129, 19);
-            this.shrinkToFitCheckBox.TabIndex = 11;
-            this.shrinkToFitCheckBox.Text = "Shrink to fit screen";
-            this.shrinkToFitCheckBox.UseVisualStyleBackColor = true;
-            this.shrinkToFitCheckBox.CheckedChanged += new System.EventHandler(this.ShrinkToFitCheckBox_CheckedChanged);
             // 
             // alignmentComboBox
             // 
@@ -373,7 +359,7 @@ namespace AMSoftware.Quotes
             this.alignmentLabel.AutoSize = true;
             this.alignmentLabel.Location = new System.Drawing.Point(8, 93);
             this.alignmentLabel.Name = "alignmentLabel";
-            this.alignmentLabel.Size = new System.Drawing.Size(62, 15);
+            this.alignmentLabel.Size = new System.Drawing.Size(70, 17);
             this.alignmentLabel.TabIndex = 8;
             this.alignmentLabel.Text = "Alignment";
             // 
@@ -384,7 +370,7 @@ namespace AMSoftware.Quotes
             this.fontTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.fontTextBox.Name = "fontTextBox";
             this.fontTextBox.ReadOnly = true;
-            this.fontTextBox.Size = new System.Drawing.Size(279, 20);
+            this.fontTextBox.Size = new System.Drawing.Size(279, 22);
             this.fontTextBox.TabIndex = 7;
             this.fontTextBox.TabStop = false;
             // 
@@ -394,7 +380,7 @@ namespace AMSoftware.Quotes
             this.fontLabel.Location = new System.Drawing.Point(8, 27);
             this.fontLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.fontLabel.Name = "fontLabel";
-            this.fontLabel.Size = new System.Drawing.Size(31, 15);
+            this.fontLabel.Size = new System.Drawing.Size(36, 17);
             this.fontLabel.TabIndex = 3;
             this.fontLabel.Text = "Font";
             // 
@@ -430,10 +416,10 @@ namespace AMSoftware.Quotes
             this.pathTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.pathTextBox.Name = "pathTextBox";
             this.pathTextBox.ReadOnly = true;
-            this.pathTextBox.Size = new System.Drawing.Size(279, 20);
+            this.pathTextBox.Size = new System.Drawing.Size(279, 22);
             this.pathTextBox.TabIndex = 5;
             this.pathTextBox.TabStop = false;
-            this.pathTextBox.Text = global::AMSoftware.Quotes.Properties.Settings.Default.SourcePath;
+            this.pathTextBox.Text = global::AMSoftware.QuotesScreensaver.Properties.Settings.Default.SourcePath;
             // 
             // pathLabel
             // 
@@ -441,7 +427,7 @@ namespace AMSoftware.Quotes
             this.pathLabel.Location = new System.Drawing.Point(8, 27);
             this.pathLabel.Margin = new System.Windows.Forms.Padding(4);
             this.pathLabel.Name = "pathLabel";
-            this.pathLabel.Size = new System.Drawing.Size(32, 15);
+            this.pathLabel.Size = new System.Drawing.Size(37, 17);
             this.pathLabel.TabIndex = 0;
             this.pathLabel.Text = "Path";
             this.pathLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -554,7 +540,6 @@ namespace AMSoftware.Quotes
         private System.Windows.Forms.Button backgroundColorButton;
         private System.Windows.Forms.TextBox backgroundColorTextBox;
         private System.Windows.Forms.GroupBox textGroupBox;
-        private System.Windows.Forms.CheckBox shrinkToFitCheckBox;
         private System.Windows.Forms.ComboBox alignmentComboBox;
         private System.Windows.Forms.Label alignmentLabel;
         private System.Windows.Forms.TextBox fontTextBox;

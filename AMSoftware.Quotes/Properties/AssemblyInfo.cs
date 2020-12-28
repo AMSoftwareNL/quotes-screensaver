@@ -1,6 +1,6 @@
 ﻿/*
 Quotes Screensaver
-Copyright (C) 2018 Arjan Meskers / AMSoftware
+Copyright (C) 2020 Arjan Meskers / AMSoftware
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -27,7 +27,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("AMSoftware")]
 [assembly: AssemblyProduct("Quotes Screensaver")]
-[assembly: AssemblyCopyright("Copyright © AMSoftware 2018")]
+[assembly: AssemblyCopyright("Copyright © AMSoftware 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -49,5 +49,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.2.*")]
-[assembly: AssemblyFileVersion("2.2.1.0")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyFileVersion("3.0.0.0")]

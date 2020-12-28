@@ -1,6 +1,6 @@
 ﻿/*
 Quotes Screensaver
-Copyright (C) 2018 Arjan Meskers / AMSoftware
+Copyright (C) 2020 Arjan Meskers / AMSoftware
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -23,15 +23,21 @@ using System.Runtime.Serialization.Json;
 using System.Xml.Serialization;
 
 
-namespace AMSoftware.Quotes
+namespace AMSoftware.QuotesScreensaver
 {
     internal abstract class QuoteManager : IDisposable, IEnumerable<Quote>
     {
         protected Quotes _quotes = null;
         protected string _inputFileName = null;
+        protected int _currentPosition = 0;
 
         public static QuoteManager Create(string inputUri)
         {
+            if (string.IsNullOrWhiteSpace(inputUri))
+            {
+                return null;
+            }
+
             string extension = Path.GetExtension(inputUri);
             if (extension.Equals(".xml", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -82,7 +88,33 @@ namespace AMSoftware.Quotes
             }
 
             Random r = new Random();
-            return _quotes[r.Next(0, _quotes.Count - 1)];
+            _currentPosition = r.Next(0, _quotes.Count);
+
+            return _quotes[_currentPosition];
+        }
+
+        public virtual Quote ReadNext()
+        {
+            if (_quotes == null || _quotes.Count == 0)
+            {
+                return QuoteManager.Default;
+            }
+
+            _currentPosition++;
+            if (_currentPosition >= _quotes.Count) _currentPosition = 0;
+            return _quotes[_currentPosition];
+        }
+
+        public virtual Quote ReadPrevious()
+        {
+            if (_quotes == null || _quotes.Count == 0)
+            {
+                return QuoteManager.Default;
+            }
+
+            _currentPosition--;
+            if (_currentPosition < 0) _currentPosition = _quotes.Count - 1;
+            return _quotes[_currentPosition];
         }
 
         public abstract void WriteToFile(Quotes quotes);

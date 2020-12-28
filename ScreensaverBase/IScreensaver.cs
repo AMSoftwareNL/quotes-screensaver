@@ -15,34 +15,18 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+using System;
 using System.Drawing;
+using System.Windows.Forms;
 
-namespace AMSoftware.QuotesScreensaver
+namespace AMSoftware.Screensaver
 {
-    internal class RenderSettings
+    interface IScreensaver
     {
-        public Font TextFont { get; set; }
-        public Color TextColor { get; set; }
-        public Color BackgroundColor { get; set; }
-        public TextAlignment TextAlignment { get; set; }
-        public string BackgroundImagePath { get; set; }
-        public BackgroundAlignment BackgroundAlignment { get; internal set; }
-        public decimal BackgroundOpacity { get; internal set; }
-    }
-
-    internal enum TextAlignment
-    {
-        Auto = 0,
-        Left,
-        Center,
-        Right
-    }
-
-    internal enum BackgroundAlignment
-    {
-        Fit = 0,
-        Stretch,
-        Center,
-        Tile
+        Form ConfigurationDialog { get; }
+        void Initialize(bool isPreview);
+        void RenderBackground(Graphics g, RectangleF bounds);
+        void Render(Graphics g, RectangleF bounds);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace AMSoftware.Quotes
+﻿namespace AMSoftware.QuotesScreensaver
 {
     partial class EditForm
     {

@@ -1,6 +1,6 @@
 ﻿/*
 Quotes Screensaver
-Copyright (C) 2018 Arjan Meskers / AMSoftware
+Copyright (C) 2020 Arjan Meskers / AMSoftware
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -15,14 +15,14 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-using AMSoftware.Quotes.Properties;
+using AMSoftware.QuotesScreensaver.Properties;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections;
 using System.IO;
 
-namespace AMSoftware.Quotes
+namespace AMSoftware.QuotesScreensaver
 {
     public partial class ConfigForm : Form
     {
@@ -53,7 +53,6 @@ namespace AMSoftware.Quotes
             // Font
             fontTextBox.Text = $"{_configSettings.TextFont.FontFamily.Name}; {_configSettings.TextFont.Style}";
             textColorTextBox.Text = $"#{_configSettings.TextColor.R:X2}{_configSettings.TextColor.G:X2}{_configSettings.TextColor.B:X2}";
-            shrinkToFitCheckBox.Checked = _configSettings.TextShrinkToFit;
 
             alignmentComboBox.DataSource = new ArrayList()
             {
@@ -151,13 +150,6 @@ namespace AMSoftware.Quotes
 
                 applyButton.Enabled = true;
             }
-        }
-
-        private void ShrinkToFitCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            _configSettings.TextShrinkToFit = shrinkToFitCheckBox.Checked;
-
-            applyButton.Enabled = true;
         }
 
         private void AlignmentComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -290,7 +282,6 @@ namespace AMSoftware.Quotes
                 TextFont = _configSettings.TextFont,
                 TextColor = _configSettings.TextColor,
                 TextAlignment = (TextAlignment)_configSettings.TextAlignment,
-                TextShrinkToFit = true,
                 BackgroundColor = _configSettings.BackgroundColor,
                 BackgroundImagePath = _configSettings.BackgroundImagePath,
                 BackgroundAlignment = (BackgroundAlignment)_configSettings.BackgroundAlignment,
@@ -301,7 +292,7 @@ namespace AMSoftware.Quotes
 
         private void PictureBox_Paint(object sender, PaintEventArgs e)
         {
-            Quote q = null;
+            Quote q;
             if (string.IsNullOrWhiteSpace(_configSettings.SourcePath))
             {
                 q = QuoteManager.Default;
@@ -317,7 +308,6 @@ namespace AMSoftware.Quotes
                 TextFont = _configSettings.TextFont,
                 TextColor = _configSettings.TextColor,
                 TextAlignment = (TextAlignment)_configSettings.TextAlignment,
-                TextShrinkToFit = true,
                 BackgroundColor = _configSettings.BackgroundColor,
                 BackgroundImagePath = _configSettings.BackgroundImagePath,
                 BackgroundAlignment = (BackgroundAlignment)_configSettings.BackgroundAlignment,

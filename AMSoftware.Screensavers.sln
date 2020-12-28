@@ -1,11 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMSoftware.Quotes", "AMSoftware.Quotes\AMSoftware.Quotes.csproj", "{E9F0DB6F-C6A9-46C9-9220-2EAF0B0FDD15}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMSoftware.QuotesScreensaver", "AMSoftware.Quotes\AMSoftware.QuotesScreensaver.csproj", "{E9F0DB6F-C6A9-46C9-9220-2EAF0B0FDD15}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ScreensaverBase", "ScreensaverBase\ScreensaverBase.shproj", "{97053AA6-525E-4960-8FA2-98C961B7D937}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		ScreensaverBase\ScreensaverBase.projitems*{97053aa6-525e-4960-8fa2-98c961b7d937}*SharedItemsImports = 13
+		ScreensaverBase\ScreensaverBase.projitems*{e9f0db6f-c6a9-46c9-9220-2eaf0b0fdd15}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -21,14 +27,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F6FB9BD3-749A-4F02-B4E1-76BFFB6A2B0E}
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.amsoftware.nl/products
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = AMSoftware.Quotes\\AMSoftware.Quotes.csproj
-		SccProjectName1 = AMSoftware.Quotes
-		SccLocalPath1 = AMSoftware.Quotes
 	EndGlobalSection
 EndGlobal

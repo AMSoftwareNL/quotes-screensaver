@@ -1,6 +1,6 @@
 ﻿/*
 Quotes Screensaver
-Copyright (C) 2018 Arjan Meskers / AMSoftware
+Copyright (C) 2020 Arjan Meskers / AMSoftware
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace AMSoftware.Quotes
+namespace AMSoftware.QuotesScreensaver
 {
     [Serializable]
     [DataContract]
