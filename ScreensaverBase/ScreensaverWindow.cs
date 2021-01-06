@@ -46,8 +46,6 @@ namespace AMSoftware.Screensaver
         public override void CreateHandle(CreateParams cp)
         {
             base.CreateHandle(cp);
-
-            InitGraphics();
         }
 
         protected override void WndProc(ref Message m)
@@ -58,6 +56,8 @@ namespace AMSoftware.Screensaver
             {
                 case (int)WindowsMessages.WM_CREATE:
                     // Retrieve any initialization data from the Regedit.ini file. Set a window timer for the screen saver window. Perform any other required initialization.
+                    InitGraphics();
+
                     _context.Initialize(_isPreview);
 
                     SetTimer(this.Handle, new IntPtr(1), 500, IntPtr.Zero);
@@ -84,15 +84,12 @@ namespace AMSoftware.Screensaver
                     break;
                 case (int)WindowsMessages.WM_ACTIVATE:
                     // Terminate the screen saver if the wParam parameter is set to FALSE
-                    if (!_isPreview)
+                    bool wParamBoolValue = Convert.ToBoolean(m.WParam.ToInt32());
+                    if (wParamBoolValue == false)
                     {
-                        bool wParamBoolValue = Convert.ToBoolean(m.WParam.ToInt32());
-                        if (wParamBoolValue == false)
-                        {
-                            Application.Exit();
-                        }
-                        m.Result = IntPtr.Zero;
+                        Application.Exit();
                     }
+                    m.Result = IntPtr.Zero;
                     break;
                 case (int)WindowsMessages.WM_SETCURSOR:
                     // Set the cursor to the null cursor, removing it from the screen.

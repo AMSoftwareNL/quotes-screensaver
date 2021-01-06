@@ -67,12 +67,18 @@ namespace AMSoftware.QuotesScreensaver
 
         public void Render(Graphics g, RectangleF bounds)
         {
-            _renderer.RenderText(_quote, g, bounds);
+                _renderer.RenderText(_quote, g, bounds);
         }
 
         public void RenderBackground(Graphics g, RectangleF bounds)
         {
-            _renderer.RenderBackground(g, bounds);
+            BufferedGraphicsContext bufferedGraphicsContext = BufferedGraphicsManager.Current;
+            using (BufferedGraphics bufferedGraphics = bufferedGraphicsContext.Allocate(g, Rectangle.Round(bounds)))
+            {
+                _renderer.RenderBackground(bufferedGraphics.Graphics, bounds);
+
+                bufferedGraphics.Render(g);
+            }
         }
     }
 }

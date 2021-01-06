@@ -102,7 +102,11 @@ namespace AMSoftware.Screensaver
                 {
                     CreateParams windowParams = new CreateParams()
                     {
+#if DEBUG
+                        ExStyle = unchecked((int)(WindowStylesEx.WS_EX_TOOLWINDOW)),
+#else
                         ExStyle = unchecked((int)(WindowStylesEx.WS_EX_TOOLWINDOW | WindowStylesEx.WS_EX_TOPMOST)),
+#endif
                         Caption = "Screensaver",
                         Style = unchecked((int)(WindowStyles.WS_POPUP | WindowStyles.WS_VISIBLE | WindowStyles.WS_CLIPSIBLINGS | WindowStyles.WS_CLIPCHILDREN)),
                         X = screen.Bounds.X,
@@ -173,15 +177,15 @@ namespace AMSoftware.Screensaver
             Dispose(false);
         }
 
-        #region Win32 API Declarations
+#region Win32 API Declarations
         [DllImport("user32.dll")]
         private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
 
         [DllImport("user32.dll")]
         private static extern int GetSystemMetrics(SystemMetric smIndex);
-        #endregion
+#endregion
 
-        #region Win32 API Enums and Structs
+#region Win32 API Enums and Structs
         [Flags]
         private enum WindowStyles : uint
         {
@@ -384,6 +388,6 @@ namespace AMSoftware.Screensaver
             SM_CONVERTIBLESLATEMODE = 0x2003,
             SM_SYSTEMDOCKED = 0x2004,
         }
-        #endregion
+#endregion
     }
 }
