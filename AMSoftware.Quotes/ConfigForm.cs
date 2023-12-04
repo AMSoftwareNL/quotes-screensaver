@@ -71,10 +71,11 @@ namespace AMSoftware.QuotesScreensaver
 
             backgroundAlignmentComboBox.DataSource = new ArrayList()
             {
+                Tuple.Create<BackgroundAlignment,string>(BackgroundAlignment.Fill, "Fill"),
                 Tuple.Create<BackgroundAlignment,string>(BackgroundAlignment.Fit, "Fit"),
                 Tuple.Create<BackgroundAlignment,string>(BackgroundAlignment.Stretch, "Stretch"),
-                Tuple.Create<BackgroundAlignment,string>(BackgroundAlignment.Center, "Center"),
                 Tuple.Create<BackgroundAlignment, string>(BackgroundAlignment.Tile, "Tile"),
+                Tuple.Create<BackgroundAlignment,string>(BackgroundAlignment.Center, "Center")
             };
             backgroundAlignmentComboBox.DisplayMember = "Item2";
             backgroundAlignmentComboBox.ValueMember = "Item1";

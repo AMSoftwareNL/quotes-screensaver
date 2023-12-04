@@ -17,9 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace AMSoftware.QuotesScreensaver
 {
@@ -78,9 +76,13 @@ namespace AMSoftware.QuotesScreensaver
                 try
                 {
                     Image backgroundImage = Image.FromFile(_settings.BackgroundImagePath);
+                    NormalizeOrientation(ref backgroundImage);
 
                     switch (_settings.BackgroundAlignment)
                     {
+                        case BackgroundAlignment.Fill:
+                            DrawBackgroundFilled(g, backgroundImage, bounds);
+                            break;
                         case BackgroundAlignment.Fit:
                             DrawBackgroundFitted(g, backgroundImage, bounds);
                             break;
@@ -110,57 +112,70 @@ namespace AMSoftware.QuotesScreensaver
                 g.FillRectangle(opacityBrush, bounds);
             }
         }
-        
+
+        /// <summary>
+        /// Image is scaled to fill the screen. What doesn't fit is cropped. Image is centered
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="backgroundImage"></param>
+        /// <param name="displayBounds"></param>
+        private static void DrawBackgroundFilled(Graphics g, Image backgroundImage, RectangleF displayBounds)
+        {
+            float widthRatio = displayBounds.Width / backgroundImage.Width;
+            float heightRatio = displayBounds.Height / backgroundImage.Height;
+            float appliedRatio = Math.Max(widthRatio, heightRatio);
+
+            float width = backgroundImage.Width * appliedRatio;
+            float height = backgroundImage.Height * appliedRatio;
+
+            RectangleF destRectangle = new RectangleF(
+                (displayBounds.Width - width) / 2,
+                (displayBounds.Height - height) / 2,
+                width, height);
+
+            g.DrawImage(backgroundImage, destRectangle);
+        }
+
+        /// <summary>
+        /// Image is centered on the screen. Image is scaled to be shown complete. Nothing is cropped.
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="backgroundImage"></param>
+        /// <param name="displayBounds"></param>
         private static void DrawBackgroundFitted(Graphics g, Image backgroundImage, RectangleF displayBounds)
         {
-            float ratioScreen = displayBounds.Width / displayBounds.Height;
-            float ratioImage = (float)backgroundImage.Width / (float)backgroundImage.Height;
+            float widthRatio = displayBounds.Width / backgroundImage.Width;
+            float heightRatio = displayBounds.Height / backgroundImage.Height;
+            float appliedRatio = Math.Min(widthRatio, heightRatio);
 
-            if (ratioScreen < ratioImage)
-            {
-                float width = displayBounds.Height * ratioImage;
-                RectangleF destRectangle = new RectangleF(
-                    (displayBounds.Width - width) / 2, 0,
-                    width, displayBounds.Height);
+            float width = backgroundImage.Width * appliedRatio;
+            float height = backgroundImage.Height * appliedRatio;
 
-                g.DrawImage(backgroundImage, destRectangle);
-            }
-            else
-            {
-                float height = displayBounds.Width * ratioImage;
-                RectangleF destRectangle = new RectangleF(
-                    0, (displayBounds.Height - height) / 2,
-                    displayBounds.Width, height);
+            RectangleF destRectangle = new RectangleF(
+                (displayBounds.Width - width) / 2,
+                (displayBounds.Height - height) / 2,
+                width, height);
 
-                g.DrawImage(backgroundImage, destRectangle);
-            }
+            g.DrawImage(backgroundImage, destRectangle);
         }
 
+        /// <summary>
+        /// Image is scaled both horizontal and vertical without keeping aspect ratio to fill the entire screen.
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="backgroundImage"></param>
+        /// <param name="displayBounds"></param>
         private static void DrawBackgroundStretched(Graphics g, Image backgroundImage, RectangleF displayBounds)
         {
-            float ratioScreen = displayBounds.Width / displayBounds.Height;
-            float ratioImage = (float)backgroundImage.Width / (float)backgroundImage.Height;
-
-            if (ratioScreen < ratioImage)
-            {
-                float height = backgroundImage.Width / ratioScreen;
-                RectangleF srcRectangle = new RectangleF(
-                    0, (backgroundImage.Height - height) / 2,
-                    backgroundImage.Width, height);
-
-                g.DrawImage(backgroundImage, displayBounds, srcRectangle, GraphicsUnit.Pixel);
-            }
-            else
-            {
-                float width = backgroundImage.Height / ratioScreen;
-                RectangleF srcRectangle = new RectangleF(
-                    (backgroundImage.Width - width) / 2, 0,
-                    width, backgroundImage.Height);
-
-                g.DrawImage(backgroundImage, displayBounds, srcRectangle, GraphicsUnit.Pixel);
-            }
+            g.DrawImage(backgroundImage, displayBounds);
         }
 
+        /// <summary>
+        /// Image is NOT scaled. Draw image from left upper corner, and repeat until screen (vertical and horizontal) is filled.
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="backgroundImage"></param>
+        /// <param name="displayBounds"></param>
         private static void DrawBackgroundTiled(Graphics g, Image backgroundImage, RectangleF displayBounds)
         {
             Rectangle srcRectangle = new Rectangle(0, 0, backgroundImage.Width, backgroundImage.Height);
@@ -168,19 +183,22 @@ namespace AMSoftware.QuotesScreensaver
             int tileCountWidth = (int)Math.Ceiling(displayBounds.Width / srcRectangle.Width);
             int tileCountHeight = (int)Math.Ceiling(displayBounds.Height / srcRectangle.Height);
 
-            int offsetX = (int)Math.Round(((tileCountWidth * srcRectangle.Width) - displayBounds.Width) / 2);
-            int offsetY = (int)Math.Round(((tileCountHeight * srcRectangle.Height) - displayBounds.Height) / 2); ;
-
             for (int y = 0; y < tileCountHeight; y++)
             {
                 for (int x = 0; x < tileCountWidth; x++)
                 {
-                    Rectangle destRectangle = new Rectangle((x * srcRectangle.Width) - offsetX, (y * srcRectangle.Height) - offsetY, srcRectangle.Width, srcRectangle.Height);
+                    Rectangle destRectangle = new Rectangle(x * srcRectangle.Width, y * srcRectangle.Height, srcRectangle.Width, srcRectangle.Height);
                     g.DrawImageUnscaledAndClipped(backgroundImage, destRectangle);
                 }
             }
         }
 
+        /// <summary>
+        /// Image is NOT scaled. True size is used. Center of image is on center of screen.
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="backgroundImage"></param>
+        /// <param name="displayBounds"></param>
         private static void DrawBackgroundCentered(Graphics g, Image backgroundImage, RectangleF displayBounds)
         {
             Rectangle destRectangle = new Rectangle()
@@ -192,6 +210,43 @@ namespace AMSoftware.QuotesScreensaver
             };
 
             g.DrawImageUnscaledAndClipped(backgroundImage, destRectangle);
+        }
+
+        private static void NormalizeOrientation(ref Image image)
+        {
+            const int ExifOrientationTagId = 0x0112;
+
+            if (Array.IndexOf(image.PropertyIdList, ExifOrientationTagId) > -1)
+            {
+                int orientation = image.GetPropertyItem(ExifOrientationTagId).Value[0];
+
+                switch (orientation)
+                {
+                    case 2:
+                        image.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                        break;
+                    case 3:
+                        image.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                        break;
+                    case 4:
+                        image.RotateFlip(RotateFlipType.Rotate180FlipX);
+                        break;
+                    case 5:
+                        image.RotateFlip(RotateFlipType.Rotate90FlipX);
+                        break;
+                    case 6:
+                        image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                        break;
+                    case 7:
+                        image.RotateFlip(RotateFlipType.Rotate270FlipX);
+                        break;
+                    case 8:
+                        image.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                        break;
+                }
+
+                image.RemovePropertyItem(ExifOrientationTagId);
+            }
         }
 
         private static Font GetFittedFont(string text, Graphics g, Font textFont, RectangleF area)

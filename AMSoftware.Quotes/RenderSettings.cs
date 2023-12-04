@@ -40,9 +40,10 @@ namespace AMSoftware.QuotesScreensaver
 
     internal enum BackgroundAlignment
     {
-        Fit = 0,
+        Fill = 0,
+        Fit,
         Stretch,
-        Center,
-        Tile
+        Tile,
+        Center
     }
 }
